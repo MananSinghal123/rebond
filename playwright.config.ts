@@ -19,6 +19,8 @@ export default defineConfig({
       DATABASE_URL: 'file:./e2e.db',
       DEMO_DEV_TOOLS: '1',
       SESSION_SECRET: 'e2e-session-secret-at-least-32-characters',
+      // Renders the assistant widget; e2e/assistant.spec.ts stubs /api/chat, so no real calls are made.
+      ANTHROPIC_API_KEY: 'e2e-placeholder',
     },
   },
 });

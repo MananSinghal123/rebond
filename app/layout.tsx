@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
 import { IBM_Plex_Mono, IBM_Plex_Sans } from 'next/font/google';
 import type { ReactNode } from 'react';
+import { ChatWidget } from '@/components/assistant/chat-widget';
 import { MotionObserver } from '@/components/motion-observer';
 import { SiteHeader } from '@/components/site-header';
+import { assistantEnabled } from '@/lib/assistant/client';
 import './globals.css';
 
 const plexSans = IBM_Plex_Sans({ subsets: ['latin'], weight: ['400', '500', '600'], variable: '--font-plex-sans' });
@@ -28,6 +30,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <SiteHeader />
         {children}
         <MotionObserver />
+        {assistantEnabled() && <ChatWidget />}
       </body>
     </html>
   );

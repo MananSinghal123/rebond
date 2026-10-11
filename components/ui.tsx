@@ -30,7 +30,7 @@ export function ButtonLink({
   return <Link className={`${BUTTON_BASE} ${BUTTON_VARIANTS[variant]} ${className}`} {...props} />;
 }
 
-const CONTROL =
+export const CONTROL =
   'w-full rounded-[6px] border border-line-strong bg-surface px-3 text-[16px] text-ink sm:text-[15px] shadow-[inset_0_1px_1px_oklch(0.2_0.008_255/0.04)] transition-[border-color,box-shadow] duration-150 placeholder:text-muted hover:border-ink/30 focus:border-accent focus:shadow-[0_0_0_3px_color-mix(in_oklch,var(--color-accent)_16%,transparent)] focus:outline-none';
 
 // 16px text on phones stops iOS Safari zooming the page when a field takes focus.

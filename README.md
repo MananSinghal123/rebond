@@ -16,10 +16,16 @@ Sign-in options: **Continue with Google** (a demo that creates an account plus a
 
 Seeded accounts: `northwind@`, `harbor@`, `meridian@` (companies), `atlas@`, `juniper@` (curators), and `investor1@` to `investor3@`, all `@rebond.demo`.
 
+## Assistant
+
+A floating **Ask ReBond** chat, on every page and open to visitors, answers questions about how ReBond works using Claude. Set `ANTHROPIC_API_KEY` in `.env` to turn it on. Without a key the widget is hidden. `ASSISTANT_MODEL` overrides the default model (`claude-opus-5-5`).
+
+It is FAQ-only. Its knowledge base is [lib/assistant/knowledge.ts](lib/assistant/knowledge.ts), which pulls amounts, fees and statuses from `lib/domain`. It can't see accounts, bonds or portfolios, and it points users to the right page for those. `/api/chat` is rate limited per IP, in memory (10 a minute, 100 a day). A multi-instance deploy needs a shared store instead.
+
 ## Test
 
 ```bash
-pnpm test        # Vitest: pure domain + services against prisma/test.db
+pnpm test        # Vitest: pure domain + services against prisma/test.db, plus the assistant (no API calls)
 pnpm test:e2e    # Playwright: the full demo script from REQUIREMENTS.md §10
 ```
 

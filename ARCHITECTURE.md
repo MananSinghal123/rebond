@@ -33,6 +33,7 @@ A single Next.js 15 App Router app. Mutations go through server actions, which c
 | Read models | Curator rank, marketplace, portfolio | `lib/services/{curators,marketplace,portfolio}.ts` | View objects |
 | Auth | Session token, route rules, cookies | `lib/auth/` | `routeAccess`, `requireActor`, `requireSession` |
 | UI | Primitives and bond panels | `components/` | Presentational props |
+| Assistant | FAQ chatbot: knowledge base, prompt, Claude call, rate limit | `lib/assistant/`, public `app/api/chat/route.ts`, `components/assistant/` | `handleChat`; streams plain text. No DB access |
 
 ## State and consistency boundaries
 | Boundary | State owner | Invariants | Atomicity |

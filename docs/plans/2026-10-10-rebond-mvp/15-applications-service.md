@@ -190,7 +190,7 @@ export const ApplicationSchema = z.object({
     .max(MAX_AMOUNT_USD, 'Annual revenue is capped at $8,000,000 in this demo.'),
 });
 
-export type DocumentUpload = { name: string; bytes: Uint8Array };
+export type DocumentUpload = { name: string; bytes: Uint8Array<ArrayBuffer> };
 
 export type SaveRequest = {
   bondId?: string;

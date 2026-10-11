@@ -155,12 +155,13 @@ export function ChatWidget() {
           type="button"
           onClick={() => setOpen(true)}
           aria-haspopup="dialog"
-          className="fixed right-4 bottom-4 z-40 inline-flex h-11 items-center gap-2 rounded-[8px] border border-line-strong bg-surface px-4 text-[15px] font-medium text-ink shadow-[0_6px_20px_oklch(0.2_0.008_255/0.12)] transition-colors duration-150 hover:bg-fill sm:right-6 sm:bottom-6"
+          className="fixed right-4 bottom-4 z-40 inline-flex size-12 items-center justify-center gap-2 rounded-[8px] border border-line-strong bg-surface text-[15px] font-medium text-ink shadow-[0_6px_20px_oklch(0.2_0.022_258/0.14)] transition-colors duration-150 hover:bg-fill active:translate-y-px sm:right-6 sm:bottom-6 sm:h-11 sm:w-auto sm:px-4"
         >
           <svg aria-hidden viewBox="0 0 20 20" className="size-[18px] text-accent" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round">
             <path d="M3.5 4.5h13v9h-7l-4 3v-3h-2z" />
           </svg>
-          Ask ReBond
+          {/* Phones: icon only, so the launcher never covers content; the name stays for assistive tech. */}
+          <span className="max-sm:sr-only">Ask ReBond</span>
         </button>
       )}
 

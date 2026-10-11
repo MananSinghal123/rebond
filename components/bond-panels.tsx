@@ -40,11 +40,11 @@ export function BondTerms(props: BondTermsProps) {
     ['Maturity', props.maturityDate ? formatDate(props.maturityDate) : 'Set when fully funded'],
   ];
   return (
-    <dl className="grid grid-cols-2 border-y border-line py-1.5 sm:grid-cols-3">
+    <dl className="grid grid-cols-3 border-y border-line py-1 sm:py-1.5">
       {rows.map(([label, value]) => (
-        <div key={label} className="py-2.5 pr-4">
-          <dt className="label">{label}</dt>
-          <dd className="mt-1 text-[15px] font-medium">{value}</dd>
+        <div key={label} className="min-w-0 py-2 pr-3 sm:py-2.5 sm:pr-4">
+          <dt className="label max-sm:text-[10px] max-sm:tracking-[0.04em]">{label}</dt>
+          <dd className="mt-0.5 text-[14px] leading-snug font-medium sm:mt-1 sm:text-[15px]">{value}</dd>
         </div>
       ))}
     </dl>
@@ -96,10 +96,21 @@ export function ScheduleTable({ rows }: { rows: ScheduleRow[] }) {
           {rows.map((row) => (
             <tr key={row.id}>
               <td data-mobile-hide className={`${tdClass} font-mono text-[13px] text-muted`}>{String(row.seq).padStart(2, '0')}</td>
-              <td data-primary className={tdClass}>{formatDate(row.dueDate)}</td>
+              <td data-primary className={tdClass}>
+                {formatDate(row.dueDate)}
+                {/* Phones: what the payout includes and its status share one line under the date. */}
+                <span className="mt-0.5 flex flex-wrap items-center gap-x-2 text-[13px] font-normal text-muted sm:hidden">
+                  {row.isPrincipal ? 'Interest + principal' : 'Interest'}
+                  <span aria-hidden>·</span>
+                  <span className={`inline-flex items-center gap-1.5 ${row.status === 'SCHEDULED' ? '' : 'text-ink'}`}>
+                    <span aria-hidden className={`size-1.5 rounded-full ${STATUS_DOT[row.status]}`} />
+                    {DISTRIBUTION_LABEL[row.status]}
+                  </span>
+                </span>
+              </td>
               <td data-figure className={`${tdClass} ${numClass} font-medium`}>{formatUsd(row.amountCents)}</td>
-              <td data-label="Includes" className={tdClass}>{row.isPrincipal ? 'Interest + principal' : 'Interest'}</td>
-              <td data-label="Status" className={`${tdClass} ${row.status === 'SCHEDULED' ? 'text-muted' : ''}`}>
+              <td data-label="Includes" data-mobile-hide className={tdClass}>{row.isPrincipal ? 'Interest + principal' : 'Interest'}</td>
+              <td data-label="Status" data-mobile-hide className={`${tdClass} ${row.status === 'SCHEDULED' ? 'text-muted' : ''}`}>
                 <span className="inline-flex items-center gap-2">
                   <span aria-hidden className={`size-1.5 rounded-full ${STATUS_DOT[row.status]}`} />
                   {DISTRIBUTION_LABEL[row.status]}
@@ -129,17 +140,19 @@ export function ChainRecord({ events }: { events: ChainRow[] }) {
       {events.map((event) => (
         <li
           key={event.id}
-          className="grid grid-cols-[1fr_auto] items-baseline gap-x-4 gap-y-1 border-b border-line py-3 first:pt-0 last:border-b-0 last:pb-0"
+          className="grid grid-cols-[1fr_auto] items-baseline gap-x-3 gap-y-1 border-b border-line py-2.5 sm:gap-x-4 sm:py-3 first:pt-0 last:border-b-0 last:pb-0"
         >
           <span className="text-[14px] font-medium">{EVENT_LABEL[event.type]}</span>
           <span className="text-[13px] text-muted">{formatDate(event.createdAt)}</span>
-          <span className="font-mono text-[12px] whitespace-nowrap text-ink-2 max-sm:col-span-2" title={event.txHash}>tx {shortHash(event.txHash)}</span>
+          <span className="font-mono text-[12px] whitespace-nowrap text-ink-2" title={event.txHash}>tx {shortHash(event.txHash)}</span>
           <span
             aria-disabled="true"
             title="Simulated record: not on a real network"
-            className="text-[13px] text-accent max-sm:col-span-2"
+            className="text-right text-[13px] whitespace-nowrap text-accent"
           >
-            View on explorer (simulated)
+            <span className="max-sm:hidden">View on explorer </span>
+            <span className="sm:hidden">Explorer </span>
+            (simulated)
           </span>
         </li>
       ))}

@@ -2,15 +2,18 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type CSSProperties } from 'react';
 import { BrandMark } from '@/components/brand-mark';
 import { activeHrefFor, type NavItem } from '@/components/nav-links';
-import { Button, shortHash } from '@/components/ui';
+import { Button, ButtonLink, shortHash } from '@/components/ui';
 
+/** Signed-in viewers get their wallet and Sign out; visitors (no `account`) get Sign in. */
 type Props = {
   items: NavItem[];
-  wallet: { address: string; demo: boolean } | null;
-  signOutAction: () => Promise<void>;
+  account?: {
+    wallet: { address: string; demo: boolean } | null;
+    signOutAction: () => Promise<void>;
+  };
 };
 
 const ICON = 'size-5';
@@ -21,7 +24,7 @@ const ICON_BUTTON =
  * Phone navigation: a menu button that opens a full-screen sheet (native popover, so Esc and
  * outside taps close it). The sheet closes itself on navigation.
  */
-export function MobileMenu({ items, wallet, signOutAction }: Props) {
+export function MobileMenu({ items, account }: Props) {
   const sheet = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const activeHref = activeHrefFor(items, pathname);
@@ -58,13 +61,14 @@ export function MobileMenu({ items, wallet, signOutAction }: Props) {
         </div>
 
         <nav aria-label="Main" className="px-4">
-          {items.map((item) => (
+          {items.map((item, index) => (
             <Link
               key={item.href}
               href={item.href}
               aria-current={item.href === activeHref ? 'page' : undefined}
               onClick={() => sheet.current?.hidePopover()}
-              className="group flex h-14 items-center justify-between border-b border-line text-[17px] font-medium text-ink-2 aria-[current=page]:text-ink"
+              style={{ '--i': index } as CSSProperties}
+              className="menu-item group flex h-14 items-center justify-between border-b border-line text-[17px] font-medium text-ink-2 transition-colors duration-150 active:bg-fill aria-[current=page]:text-ink"
             >
               {item.label}
               <span aria-hidden className="size-1.5 rounded-full bg-accent opacity-0 group-aria-[current=page]:opacity-100" />
@@ -74,19 +78,28 @@ export function MobileMenu({ items, wallet, signOutAction }: Props) {
 
         <div className="grid gap-3 px-4 pt-8">
           <p className="label">Account</p>
-          {wallet ? (
-            <div className="rounded-[6px] border border-line bg-fill px-3.5 py-3">
-              <p className="text-[13px] text-muted">{wallet.demo ? 'Demo embedded wallet' : 'Connected wallet'}</p>
-              <p className="mt-0.5 font-mono text-[13px] text-ink-2" title={wallet.address}>{shortHash(wallet.address)}</p>
-            </div>
+          {account ? (
+            <>
+              {account.wallet ? (
+                <div className="rounded-[6px] border border-line bg-fill px-3.5 py-3">
+                  <p className="text-[13px] text-muted">{account.wallet.demo ? 'Demo embedded wallet' : 'Connected wallet'}</p>
+                  <p className="mt-0.5 font-mono text-[13px] text-ink-2" title={account.wallet.address}>{shortHash(account.wallet.address)}</p>
+                </div>
+              ) : (
+                <Button variant="secondary" popoverTarget="wallet-popover" className="w-full">
+                  Connect wallet
+                </Button>
+              )}
+              <form action={account.signOutAction}>
+                <Button variant="secondary" className="w-full">Sign out</Button>
+              </form>
+            </>
           ) : (
-            <Button variant="secondary" popoverTarget="wallet-popover" className="w-full">
-              Connect wallet
-            </Button>
+            <>
+              <ButtonLink href="/login" onClick={() => sheet.current?.hidePopover()} className="w-full">Sign in</ButtonLink>
+              <p className="text-[13px] text-muted">Continue with Google, a Cardano wallet, or email.</p>
+            </>
           )}
-          <form action={signOutAction}>
-            <Button variant="secondary" className="w-full">Sign out</Button>
-          </form>
         </div>
 
         <p className="px-4 pt-8 pb-10 text-[12px] text-muted">Demo: no real funds, simulated on-chain records.</p>

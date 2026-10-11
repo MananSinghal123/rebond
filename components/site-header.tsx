@@ -10,7 +10,11 @@ import { db } from '@/lib/db';
 import type { Role } from '@/lib/domain/types';
 
 const NAV: Record<Role | 'VISITOR', NavItem[]> = {
-  VISITOR: [],
+  VISITOR: [
+    { href: '/#how-it-works', label: 'How it works' },
+    { href: '/#trust', label: 'Trust' },
+    { href: '/#markets', label: 'Markets' },
+  ],
   INVESTOR: [
     { href: '/bonds', label: 'Bonds' },
     { href: '/portfolio', label: 'Portfolio' },
@@ -77,12 +81,17 @@ export async function SiteHeader() {
                 </form>
                 <MobileMenu
                   items={items}
-                  wallet={user.walletAddress ? { address: user.walletAddress, demo: user.walletKind === 'EMBEDDED_DEMO' } : null}
-                  signOutAction={signOut}
+                  account={{
+                    wallet: user.walletAddress ? { address: user.walletAddress, demo: user.walletKind === 'EMBEDDED_DEMO' } : null,
+                    signOutAction: signOut,
+                  }}
                 />
               </>
             ) : (
-              <ButtonLink href="/login" className="h-10 px-4 sm:h-8 sm:px-3 sm:text-[13px]">Sign in</ButtonLink>
+              <>
+                <ButtonLink href="/login" className="max-sm:h-9 max-sm:px-3.5 max-sm:text-[14px] sm:h-8 sm:px-3 sm:text-[13px]">Sign in</ButtonLink>
+                <MobileMenu items={items} />
+              </>
             )}
           </div>
         </div>

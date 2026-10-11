@@ -7,12 +7,14 @@ const BUTTON_VARIANTS = {
     'bg-accent text-accent-ink shadow-[inset_0_-1px_0_oklch(0_0_0/0.14),0_1px_1px_oklch(0.2_0.008_255/0.08)] hover:bg-accent-hover',
   secondary: 'border border-line-strong bg-surface text-ink shadow-[0_1px_1px_oklch(0.2_0.008_255/0.04)] hover:bg-fill',
   danger: 'border border-bad/30 bg-surface text-bad hover:bg-bad/[0.05]',
+  /** For dark (night) bands only. */
+  inverse: 'bg-paper text-ink shadow-[inset_0_-1px_0_oklch(0.2_0.022_258/0.12)] hover:bg-surface',
 } as const;
 
 type ButtonVariant = keyof typeof BUTTON_VARIANTS;
 
 const BUTTON_BASE =
-  'inline-flex h-11 items-center justify-center gap-1.5 whitespace-nowrap rounded-[6px] px-4 text-[15px] font-medium sm:h-9 sm:px-3.5 sm:text-[14px] transition-colors duration-150 active:translate-y-px disabled:pointer-events-none disabled:opacity-45';
+  'inline-flex h-11 items-center justify-center gap-1.5 whitespace-nowrap rounded-[6px] px-4 text-[15px] font-medium sm:h-9 sm:px-3.5 sm:text-[14px] transition-[background-color,border-color,color,transform] duration-150 ease-out active:translate-y-px disabled:pointer-events-none disabled:opacity-45';
 
 export function Button({
   variant = 'primary',
@@ -148,6 +150,7 @@ export function ProgressBar({ pct, label }: { pct: number; label: string }) {
       aria-valuemin={0}
       aria-valuemax={100}
       aria-valuenow={pct}
+      data-reveal="bar"
       className="h-1 overflow-hidden rounded-full bg-ink/[0.08]"
     >
       <div className="h-full rounded-full bg-accent transition-[width] duration-500 ease-out" style={{ width: `${pct}%` }} />
@@ -161,6 +164,15 @@ export function EmptyState({ title, children }: { title: string; children?: Reac
       <p className="text-[15px] font-semibold">{title}</p>
       <div className="grid max-w-sm justify-items-center gap-4 text-[14px] text-muted">{children}</div>
     </div>
+  );
+}
+
+/** Trailing arrow for text links; pair the link with `.arrow-link` so it nudges on hover. */
+export function ArrowIcon({ className = 'size-3.5' }: { className?: string }) {
+  return (
+    <svg aria-hidden viewBox="0 0 16 16" className={className} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 8h9.5M9 4.5 12.5 8 9 11.5" />
+    </svg>
   );
 }
 

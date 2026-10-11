@@ -6,17 +6,20 @@
   and a shadow only on things that float (popover, dialog).
 */
 @theme {
-  --color-paper: oklch(0.982 0.003 95);
+  --color-paper: oklch(0.982 0.005 88);
   --color-surface: oklch(1 0 0);
-  --color-fill: oklch(0.963 0.004 95);
-  --color-ink: oklch(0.2 0.008 255);
-  --color-ink-2: oklch(0.36 0.01 255);
-  --color-muted: oklch(0.5 0.01 255);
-  --color-line: oklch(0.2 0.008 255 / 0.1);
-  --color-line-strong: oklch(0.2 0.008 255 / 0.18);
-  --color-accent: oklch(0.47 0.1 162);
-  --color-accent-hover: oklch(0.41 0.09 162);
-  --color-accent-ink: oklch(0.995 0.005 162);
+  --color-fill: oklch(0.962 0.006 88);
+  --color-ink: oklch(0.2 0.022 258);
+  --color-ink-2: oklch(0.37 0.02 258);
+  --color-muted: oklch(0.51 0.016 258);
+  --color-line: oklch(0.2 0.022 258 / 0.1);
+  --color-line-strong: oklch(0.2 0.022 258 / 0.18);
+  --color-accent: oklch(0.44 0.085 158);
+  --color-accent-hover: oklch(0.38 0.075 158);
+  --color-accent-ink: oklch(0.995 0.005 158);
+  --color-accent-mark: oklch(0.76 0.12 158);
+  --color-night: oklch(0.185 0.026 260);
+  --color-night-2: oklch(0.235 0.026 260);
   --color-warn: oklch(0.52 0.12 68);
   --color-bad: oklch(0.52 0.17 27);
 
@@ -27,7 +30,8 @@
   --radius-control: 6px;
   --radius-sheet: 8px;
 
-  --shadow-float: 0 0 0 1px oklch(0.2 0.008 255 / 0.08), 0 1px 2px oklch(0.2 0.008 255 / 0.06), 0 12px 32px -8px oklch(0.2 0.008 255 / 0.18);
+  --shadow-float: 0 0 0 1px oklch(0.2 0.022 258 / 0.08), 0 1px 2px oklch(0.2 0.022 258 / 0.06), 0 12px 32px -8px oklch(0.2 0.022 258 / 0.18);
+  --shadow-lift: 0 0 0 1px oklch(0.2 0.022 258 / 0.07), 0 2px 4px oklch(0.2 0.022 258 / 0.04), 0 24px 56px -16px oklch(0.2 0.022 258 / 0.22);
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
@@ -249,19 +253,6 @@
   animation-delay: calc(var(--stagger, 0) * 100ms + 80ms);
 }
 
-@keyframes hero-recede {
-  to {
-    opacity: 0.25;
-    transform: translate3d(0, -48px, 0);
-  }
-}
-
-@keyframes hero-drift {
-  to {
-    transform: translate3d(0, 64px, 0);
-  }
-}
-
 @keyframes band-brighten {
   from {
     background-color: var(--color-paper);
@@ -281,6 +272,122 @@
   display: none;
 }
 
+/*
+  Progress bars fill when they enter the viewport (ProgressBar carries data-reveal="bar").
+  The fill keeps its real width; only its scale animates, so the value is never misreported.
+*/
+@keyframes bar-fill {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+.motion [data-reveal="bar"] > * {
+  transform-origin: left;
+}
+
+.motion [data-reveal="bar"]:not([data-in]) > * {
+  transform: scaleX(0);
+  animation: reveal-failsafe 1ms 2.2s forwards;
+}
+
+.motion [data-reveal="bar"][data-in] > * {
+  animation: bar-fill 1400ms var(--ease-out-expo) calc(var(--reveal-delay, 0ms) + 120ms) backwards;
+}
+
+/*
+  Linework. SVG paths with pathLength="1" and .draw-path draw themselves once their
+  data-reveal="draw" container is in view, in order (--draw-i), and stay drawn.
+*/
+@keyframes path-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+
+.draw-path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+
+.motion [data-reveal="draw"]:not([data-in]) .draw-path {
+  stroke-dashoffset: 1;
+  animation: reveal-failsafe-dash 1ms 2.2s forwards;
+}
+
+.motion [data-reveal="draw"][data-in] .draw-path {
+  animation: path-draw 1600ms var(--ease-out-quint) calc(var(--reveal-delay, 0ms) + var(--draw-i, 0) * 140ms) backwards;
+}
+
+@keyframes reveal-failsafe-dash {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Nodes at the ends of a drawn line appear once the line reaches them. */
+.motion [data-reveal="draw"]:not([data-in]) .draw-node {
+  opacity: 0;
+  animation: reveal-failsafe 1ms 2.2s forwards;
+}
+
+.motion [data-reveal="draw"][data-in] .draw-node {
+  animation: reveal-fade 500ms var(--ease-out-quint) calc(var(--reveal-delay, 0ms) + var(--draw-i, 0) * 140ms + 900ms) backwards;
+}
+
+/*
+  Hero network: a packet of light travels each line from a claim to the line on the term sheet
+  that proves it, a few seconds apart. Motion-enabled viewers only; the lines themselves are static.
+*/
+@keyframes packet-travel {
+  0% {
+    offset-distance: 0%;
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  32% {
+    offset-distance: 100%;
+    opacity: 1;
+  }
+  38%,
+  100% {
+    offset-distance: 100%;
+    opacity: 0;
+  }
+}
+
+.net-packet {
+  display: none;
+}
+
+.motion .net-packet {
+  display: block;
+  offset-rotate: 0deg;
+  animation: packet-travel 7.5s var(--ease-out-quint) calc(2.4s + var(--draw-i, 0) * 2.5s) infinite backwards;
+}
+
+/* Chart bars grow from their axis as their stagger item arrives (origin set per bar). */
+@keyframes grow-y {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+.motion [data-reveal="stagger"][data-in] .grow-y {
+  animation: grow-y 1200ms var(--ease-out-expo) calc(var(--reveal-delay, 0ms) + 80ms) backwards;
+}
+
+/* Text links with a trailing arrow nudge it on hover. */
+.arrow-link svg {
+  transition: transform 220ms var(--ease-out-expo);
+}
+
+.arrow-link:hover svg {
+  transform: translateX(3px);
+}
+
 @supports (animation-timeline: scroll()) {
   .motion .page-progress {
     display: block;
@@ -296,22 +403,45 @@
     animation-range: entry 0% entry 90%;
   }
 
-  /* Parallax only where there is room for it: the copy lifts away, the deck lags behind. */
-  @media (min-width: 1024px) {
-    .motion .hero-recede {
-      animation: hero-recede linear both;
-      animation-timeline: scroll(root);
-      animation-range: 0 75vh;
-    }
+  /* The journey rail fills as its section scrolls through the viewport. */
+  .motion .rail-fill {
+    transform-origin: left;
+    animation: page-progress linear both;
+    animation-timeline: view();
+    animation-range: entry 70% cover 55%;
+  }
 
-    .motion .hero-drift {
-      animation: hero-drift linear both;
-      animation-timeline: scroll(root);
-      animation-range: 0 90vh;
+  .motion .rail-fill-y {
+    transform-origin: top;
+    animation: rail-y linear both;
+    animation-timeline: view();
+    animation-range: entry 60% cover 60%;
+  }
+
+  /* Restrained depth: an element drifts slightly slower than the page as it passes. */
+  @media (min-width: 1024px) {
+    .motion .parallax {
+      animation: parallax-drift linear both;
+      animation-timeline: view();
+      animation-range: cover;
     }
   }
 }
 
+@keyframes rail-y {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes parallax-drift {
+  from {
+    transform: translate3d(0, var(--parallax, 32px), 0);
+  }
+  to {
+    transform: translate3d(0, calc(var(--parallax, 32px) * -1), 0);
+  }
+}
 
 /*
   Responsive tables. Below 640px each row becomes a compact record: the cell marked data-primary
@@ -429,6 +559,10 @@
     opacity: 0;
     transform: translate3d(0, -8px, 0);
   }
+}
+
+.motion .menu-sheet:popover-open .menu-item {
+  animation: reveal-item 600ms var(--ease-out-expo) calc(var(--i, 0) * 45ms + 90ms) backwards;
 }
 
 html:has(.menu-sheet:popover-open) {

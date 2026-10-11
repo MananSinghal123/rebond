@@ -8,11 +8,13 @@ import type { Session } from '@/lib/auth/edge';
 import { requireRole } from '@/lib/auth/session';
 import { db } from '@/lib/db';
 import { PUBLIC_STATUSES } from '@/lib/domain/lifecycle';
-import { formatRate } from '@/lib/domain/money';
+import { expectedReturnCents, formatRate, formatUsd } from '@/lib/domain/money';
 import { BOND_STATUSES, parseEnum, PAYOUT_FREQUENCIES } from '@/lib/domain/types';
 import { getCuratorRanks } from '@/lib/services/curators';
 import { devToolsEnabled } from '@/lib/auth/dev-tools';
 import { advanceTimeAction, attestAction, fundAction } from './actions';
+
+const PER_TICKET_CENTS = 100_000;
 
 type FundingGate = 'not-investor' | 'unverified' | 'can-fund';
 
@@ -103,14 +105,20 @@ export default async function BondPage({
                 {formatRate(bond.rateBps)}
               </span>
             </p>
-            <p className="text-[13px] text-muted md:text-right">
-              Curated by
-              <span className="block text-[15px] font-medium text-ink">{curator.displayName}</span>
-            </p>
+            <div className="flex gap-8 text-[13px] text-muted md:text-right">
+              <p>
+                On $1,000 at maturity
+                <span className="block text-[15px] font-medium text-ink">{formatUsd(PER_TICKET_CENTS + expectedReturnCents(PER_TICKET_CENTS, bond.rateBps, bond.termMonths))}</span>
+              </p>
+              <p>
+                Curated by
+                <span className="block text-[15px] font-medium text-ink">{curator.displayName}</span>
+              </p>
+            </div>
           </div>
           <BondTerms {...bond} showRate={false} payoutFrequency={parseEnum(PAYOUT_FREQUENCIES, bond.payoutFrequency)} />
         </Panel>
-        <div className="md:col-start-2 md:row-span-3 md:row-start-1 md:self-stretch">
+        <div className="md:col-start-2 md:row-span-4 md:row-start-1 md:self-stretch">
           <div className="md:sticky md:top-20">
             <Panel title="Funding">
               <FundingProgress fundedCents={bond.fundedCents} amountCents={bond.amountCents} />
@@ -127,6 +135,21 @@ export default async function BondPage({
             <span className="text-muted"> · {score === null ? 'Unrated' : `Rank ${score}`}</span>
           </p>
           {bond.reviewNote && <p className="mt-3 border-l border-line-strong pl-4 text-ink-2">“{bond.reviewNote}”</p>}
+        </Panel>
+        <Panel title="Risks">
+          <ul className="grid gap-2.5 text-ink-2">
+            {[
+              `A fixed rate is not a guarantee. Distributions depend on ${bond.company.name} collecting the contracted revenue behind this bond.`,
+              'Curator review is a judgement by a named reviewer, not an audit or a credit rating.',
+              'Positions are held to maturity; this demo has no secondary market.',
+              'Simulated: no real funds move and no records are written to Cardano.',
+            ].map((risk) => (
+              <li key={risk} className="flex gap-3">
+                <span aria-hidden className="mt-[9px] size-1 shrink-0 rounded-full bg-ink/40" />
+                {risk}
+              </li>
+            ))}
+          </ul>
         </Panel>
       </div>
 

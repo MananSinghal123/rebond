@@ -56,12 +56,18 @@ export default async function PortfolioPage() {
               <tbody data-reveal="stagger">
                 {positions.map((p) => (
                   <tr key={p.positionId}>
-                    <td data-primary className={tdClass}><Link href={`/bonds/${p.bondId}`} className="font-medium hover:text-accent hover:underline">{p.companyName}</Link></td>
+                    <td data-primary className={tdClass}>
+                      <Link href={`/bonds/${p.bondId}`} className="font-medium hover:text-accent hover:underline">{p.companyName}</Link>
+                      <span className="mt-1 flex items-center gap-2 text-[13px] font-normal text-muted sm:hidden">
+                        {formatRate(p.rateBps)} fixed
+                        <StatusBadge status={p.bondStatus} />
+                      </span>
+                    </td>
                     <td data-figure className={`${tdClass} ${numClass}`}>{formatUsd(p.amountCents)}</td>
-                    <td data-label="Rate" className={`${tdClass} ${numClass}`}>{formatRate(p.rateBps)}</td>
+                    <td data-label="Rate" data-mobile-hide className={`${tdClass} ${numClass}`}>{formatRate(p.rateBps)}</td>
                     <td data-label="Maturity" className={`${tdClass} text-ink-2`}>{p.maturityDate ? formatDate(p.maturityDate) : 'Set at activation'}</td>
                     <td data-label="Received" className={`${tdClass} ${numClass}`}>{formatUsd(p.receivedCents)}</td>
-                    <td data-label="Status" className={tdClass}><StatusBadge status={p.bondStatus} /></td>
+                    <td data-label="Status" data-mobile-hide className={tdClass}><StatusBadge status={p.bondStatus} /></td>
                   </tr>
                 ))}
               </tbody>

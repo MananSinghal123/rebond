@@ -32,12 +32,12 @@ export default async function PortfolioPage() {
 
       {positions.length === 0 ? (
         <EmptyState title="No positions yet">
-          <p className="text-sm text-muted">Fund a listed bond and it appears here with its payout schedule.</p>
+          <p className="text-muted">Fund a listed bond and it appears here with its payout schedule.</p>
           <ButtonLink href="/bonds">Browse bonds</ButtonLink>
         </EmptyState>
       ) : (
         <>
-          <div className={tableWrapClass}>
+          <div className={`${tableWrapClass} rounded-[18px] bg-surface px-6 pt-5 pb-2 shadow-sheet`}>
             <table className={tableClass}>
               <caption className="sr-only">Positions</caption>
               <thead>
@@ -66,19 +66,19 @@ export default async function PortfolioPage() {
           </div>
 
           <section className="grid gap-3">
-            <h2 className="text-sm font-semibold">Distribution history</h2>
+            <h2 className="font-semibold">Distribution history</h2>
             {positions.map((p) => (
-              <details key={p.positionId} className="rounded-lg border border-line bg-surface p-4">
-                <summary className="cursor-pointer text-sm font-medium">
+              <details key={p.positionId} className="group rounded-[18px] bg-surface px-6 py-4 shadow-sheet">
+                <summary className="cursor-pointer font-medium">
                   {p.companyName} · {formatUsd(p.amountCents)} · {p.payouts.length} payouts received
                 </summary>
-                <p className="mt-3 font-mono text-xs text-muted">Position tx {shortHash(p.txHash)}</p>
-                <ul className="mt-3 grid gap-2 text-sm">
+                <p className="mt-3 font-mono text-[13px] text-muted">Position tx {shortHash(p.txHash)}</p>
+                <ul className="mt-3 grid gap-2">
                   {p.payouts.map((payout) => (
                     <li key={payout.id} className="flex flex-wrap justify-between gap-x-4">
                       <span>#{payout.seq} · {formatDate(payout.paidAt)}{payout.late && <span className="text-warn"> · late</span>}</span>
                       <span>{formatUsd(payout.amountCents)}</span>
-                      <span className="w-full font-mono text-xs text-muted">tx {shortHash(payout.txHash)}</span>
+                      <span className="w-full font-mono text-[13px] text-muted">tx {shortHash(payout.txHash)}</span>
                     </li>
                   ))}
                   {p.payouts.length === 0 && <li className="text-muted">No payouts yet.</li>}

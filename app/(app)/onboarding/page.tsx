@@ -21,16 +21,16 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
       <Panel>
         <form action={chooseRoleAction} className="grid gap-6">
           <fieldset className="grid gap-3">
-            <legend className="mb-2 text-sm font-medium">Role</legend>
+            <legend className="mb-2 font-medium">Role</legend>
             {ROLE_OPTIONS.map((option) => (
               <label
                 key={option.value}
-                className="flex cursor-pointer gap-3 rounded-md border border-line p-4 has-[:checked]:border-accent"
+                className="flex cursor-pointer gap-3 rounded-2xl bg-paper p-4 ring-1 ring-transparent transition-[box-shadow,background-color] duration-200 hover:bg-fill has-[:checked]:bg-accent/5 has-[:checked]:ring-accent"
               >
                 <input type="radio" name="role" value={option.value} required className="mt-1 accent-[var(--color-accent)]" />
                 <span className="grid gap-0.5">
-                  <span className="text-sm font-medium">{option.title}</span>
-                  <span className="text-sm text-muted">{option.body}</span>
+                  <span className="font-medium">{option.title}</span>
+                  <span className="text-muted">{option.body}</span>
                 </span>
               </label>
             ))}
@@ -38,7 +38,7 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
           <Field label="Company or display name" hint="Required for companies and curators. Shown publicly on bonds.">
             <input name="displayName" maxLength={120} className={inputClass} />
           </Field>
-          <label className="flex gap-3 text-sm">
+          <label className="flex gap-3">
             <input type="checkbox" name="verified" className="mt-0.5 accent-[var(--color-accent)]" />
             <span>
               Investors: I confirm I am a verified investor. <span className="text-muted">(Self-attested for this demo. Required to fund.)</span>

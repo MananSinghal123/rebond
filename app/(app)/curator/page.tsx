@@ -55,7 +55,7 @@ export default async function CuratorHome({ searchParams }: { searchParams: Prom
       <Panel title="Queue">
         {queue.length === 0 ? (
           <EmptyState title="The queue is empty">
-            <p className="text-sm text-muted">New applications appear here as soon as a company submits them.</p>
+            <p className="text-muted">New applications appear here as soon as a company submits them.</p>
           </EmptyState>
         ) : (
           <div className={tableWrapClass}>
@@ -95,14 +95,14 @@ export default async function CuratorHome({ searchParams }: { searchParams: Prom
 
       <Panel title="Your bonds">
         {mine.length === 0 ? (
-          <p className="text-sm text-muted">Bonds you claim or list appear here.</p>
+          <p className="text-muted">Bonds you claim or list appear here.</p>
         ) : (
           <ul className="grid gap-2">
             {mine.map((bond) => {
               const label = `${bond.company.name} · ${formatUsd(bond.amountCents)} · ${formatRate(bond.rateBps)}`;
               const href = PUBLIC_STATUSES.includes(bond.status) ? `/bonds/${bond.id}` : `/curator/review/${bond.id}`;
               return (
-                <li key={bond.id} className="flex flex-wrap items-center justify-between gap-3 text-sm">
+                <li key={bond.id} className="flex flex-wrap items-center justify-between gap-3">
                   <Link href={href} className="hover:underline">{label}</Link>
                   <StatusBadge status={bond.status} />
                 </li>

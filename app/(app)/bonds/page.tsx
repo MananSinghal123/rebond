@@ -7,32 +7,35 @@ const SORT_LABEL = { newest: 'Newest', yield: 'Highest yield', term: 'Shortest t
 
 function Card({ bond }: { bond: BondCard }) {
   return (
-    <li className="relative grid gap-4 rounded-lg border border-line bg-surface p-5 transition-colors duration-150 hover:border-ink/30">
-      <div className="flex items-start justify-between gap-3">
+    <li className="group relative grid gap-6 rounded-[22px] bg-surface p-7 shadow-sheet transition-[transform,box-shadow] duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:shadow-lift">
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="font-medium">
-            <Link href={`/bonds/${bond.id}`} className="after:absolute after:inset-0">{bond.companyName}</Link>
+          <h2 className="text-[19px] font-semibold tracking-[-0.015em]">
+            <Link href={`/bonds/${bond.id}`} className="after:absolute after:inset-0 after:rounded-[22px]">{bond.companyName}</Link>
           </h2>
-          <p className="text-xs text-muted capitalize">{bond.sector.toLowerCase()}</p>
+          <p className="text-[13px] text-muted capitalize">{bond.sector.toLowerCase()}</p>
         </div>
-        <p className="text-right">
-          <span className="block text-2xl font-semibold">{formatRate(bond.rateBps)}</span>
-          <span className="text-xs text-muted">fixed / year</span>
+        <span className="text-[13px] text-muted">{FREQUENCY_LABEL[bond.payoutFrequency]}</span>
+      </div>
+      <div>
+        <p className="font-[family-name:var(--font-display)] text-[56px] leading-none font-semibold tracking-[-0.04em]">
+          {formatRate(bond.rateBps)}
+        </p>
+        <p className="mt-1.5 text-[13px] text-muted">
+          fixed per year · {bond.termMonths} months · {formatUsd(bond.amountCents)} raise
         </p>
       </div>
-      <dl className="grid grid-cols-3 gap-2 text-sm">
-        <div><dt className="text-xs text-muted">Term</dt><dd>{bond.termMonths} mo</dd></div>
-        <div><dt className="text-xs text-muted">Raise</dt><dd>{formatUsd(bond.amountCents)}</dd></div>
-        <div><dt className="text-xs text-muted">Payouts</dt><dd>{FREQUENCY_LABEL[bond.payoutFrequency]}</dd></div>
-      </dl>
-      <div className="grid gap-1.5">
+      <div className="grid gap-2">
         <ProgressBar pct={bond.fundedPct} label={`${bond.companyName} funding progress`} />
-        <p className="text-xs text-muted">{bond.fundedPct}% funded</p>
+        <p className="text-[13px] text-muted">{bond.fundedPct}% funded</p>
       </div>
-      <p className="relative z-10 text-sm">
-        <span className="text-muted">Curated by </span>
-        <Link href={`/curators/${bond.curator.id}`} className="underline underline-offset-2">{bond.curator.displayName}</Link>
-        <span className="text-muted"> · {bond.curator.score === null ? 'Unrated' : `Rank ${bond.curator.score}`}</span>
+      <p className="relative z-10 border-t border-line pt-4 text-[13px] text-muted">
+        Curated by{' '}
+        <Link href={`/curators/${bond.curator.id}`} className="font-medium text-ink hover:underline">
+          {bond.curator.displayName}
+        </Link>
+        {' · '}
+        {bond.curator.score === null ? 'Unrated' : `Rank ${bond.curator.score}`}
       </p>
     </li>
   );
@@ -49,7 +52,7 @@ export default async function BondsPage({
   return (
     <>
       <PageHeader title="Bonds" description="Fixed-return bonds backed by contracted revenue, vetted by a named curator." />
-      <form method="get" className="mb-8 grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-7 lg:items-end">
+      <form method="get" className="mb-10 grid grid-cols-2 gap-4 rounded-[22px] bg-surface p-6 shadow-sheet md:grid-cols-4 lg:grid-cols-7 lg:items-end">
         <Field label="Min yield %"><input name="minRate" type="number" step="0.1" min={0} defaultValue={filters.minRate} className={inputClass} /></Field>
         <Field label="Max yield %"><input name="maxRate" type="number" step="0.1" min={0} defaultValue={filters.maxRate} className={inputClass} /></Field>
         <Field label="Min term"><input name="minTerm" type="number" min={0} defaultValue={filters.minTerm} className={inputClass} /></Field>
@@ -73,15 +76,15 @@ export default async function BondsPage({
         </Field>
         <div className="col-span-2 flex gap-3 md:col-span-4 lg:col-span-7">
           <Button variant="secondary">Apply filters</Button>
-          <Link href="/bonds" className="self-center text-sm text-muted hover:text-ink">Clear</Link>
+          <Link href="/bonds" className="self-center text-[15px] text-accent hover:underline">Clear</Link>
         </div>
       </form>
       {bonds.length === 0 ? (
         <EmptyState title="No bonds match these filters">
-          <Link href="/bonds" className="text-sm underline underline-offset-2">Clear filters</Link>
+          <Link href="/bonds" className="text-accent hover:underline">Clear filters</Link>
         </EmptyState>
       ) : (
-        <ul className="grid gap-4 md:grid-cols-2">
+        <ul className="grid gap-6 md:grid-cols-2">
           {bonds.map((bond) => <Card key={bond.id} bond={bond} />)}
         </ul>
       )}

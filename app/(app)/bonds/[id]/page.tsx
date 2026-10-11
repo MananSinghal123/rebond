@@ -8,6 +8,7 @@ import type { Session } from '@/lib/auth/edge';
 import { getSession } from '@/lib/auth/session';
 import { db } from '@/lib/db';
 import { PUBLIC_STATUSES } from '@/lib/domain/lifecycle';
+import { formatRate } from '@/lib/domain/money';
 import { BOND_STATUSES, parseEnum, PAYOUT_FREQUENCIES } from '@/lib/domain/types';
 import { getCuratorRanks } from '@/lib/services/curators';
 import { devToolsEnabled } from '@/lib/auth/dev-tools';
@@ -28,12 +29,12 @@ function AdvanceTime({ bondId }: { bondId: string }) {
       <form action={advanceTimeAction} className="flex flex-wrap items-center gap-4">
         <input type="hidden" name="bondId" value={bondId} />
         <Button variant="secondary">Advance time</Button>
-        <label className="flex items-center gap-2 text-sm">
+        <label className="flex items-center gap-2">
           <input type="checkbox" name="late" className="accent-[var(--color-accent)]" />
           Mark this payout as late
         </label>
       </form>
-      <p className="mt-2 text-xs text-muted">Pays the next scheduled distribution pro-rata to every position.</p>
+      <p className="mt-2 text-[13px] text-muted">Pays the next scheduled distribution pro-rata to every position.</p>
     </Panel>
   );
 }
@@ -66,9 +67,9 @@ export default async function BondPage({
 
   const fundingPanel: Record<FundingGate, ReactNode> = {
     'sign-in': <ButtonLink href={`/login?next=/bonds/${bond.id}`}>Sign in to invest</ButtonLink>,
-    'not-investor': <p className="text-sm text-muted">Only investor accounts can fund bonds.</p>,
+    'not-investor': <p className="text-muted">Only investor accounts can fund bonds.</p>,
     unverified: (
-      <form action={attestAction} className="grid gap-3 text-sm">
+      <form action={attestAction} className="grid gap-3">
         <input type="hidden" name="bondId" value={bond.id} />
         <label className="flex gap-3">
           <input type="checkbox" name="verified" required className="mt-0.5 accent-[var(--color-accent)]" />
@@ -96,22 +97,26 @@ export default async function BondPage({
 
       <div className="grid gap-6 lg:grid-cols-[1fr_20rem]">
         <div className="grid content-start gap-6">
-          <Panel title="Terms">
-            <BondTerms {...bond} payoutFrequency={parseEnum(PAYOUT_FREQUENCIES, bond.payoutFrequency)} />
+          <Panel>
+            <p className="font-[family-name:var(--font-display)] text-[72px] leading-none font-semibold tracking-[-0.045em]">
+              {formatRate(bond.rateBps)}
+            </p>
+            <p className="mt-2 mb-7 text-[15px] text-muted">fixed annual rate, curated by {curator.displayName}</p>
+            <BondTerms {...bond} showRate={false} payoutFrequency={parseEnum(PAYOUT_FREQUENCIES, bond.payoutFrequency)} />
           </Panel>
           <Panel title="Backing contracts">
-            <p className="whitespace-pre-line text-sm">{bond.contractSummary}</p>
+            <p className="whitespace-pre-line">{bond.contractSummary}</p>
           </Panel>
           <Panel title="Curator">
-            <p className="text-sm">
+            <p>
               <Link href={`/curators/${curator.id}`} className="font-medium underline underline-offset-2">{curator.displayName}</Link>
               <span className="text-muted"> · {score === null ? 'Unrated' : `Rank ${score}`}</span>
             </p>
-            {bond.reviewNote && <p className="mt-2 text-sm text-muted">“{bond.reviewNote}”</p>}
+            {bond.reviewNote && <p className="mt-2 text-muted">“{bond.reviewNote}”</p>}
           </Panel>
         </div>
 
-        <div className="grid content-start gap-6">
+        <div className="grid content-start gap-6 lg:sticky lg:top-24 lg:self-start">
           <Panel title="Funding">
             <FundingProgress fundedCents={bond.fundedCents} amountCents={bond.amountCents} />
             {status === 'LISTED' && <div className="mt-5 border-t border-line pt-5">{fundingPanel[gate]}</div>}

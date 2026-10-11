@@ -18,6 +18,7 @@ const EVENT_LABEL: Record<ChainEventType, string> = {
 };
 
 const DISTRIBUTION_LABEL: Record<DistributionStatus, string> = { SCHEDULED: 'Scheduled', PAID: 'Paid', LATE: 'Paid late' };
+const STATUS_DOT: Record<DistributionStatus, string> = { SCHEDULED: 'bg-ink/20', PAID: 'bg-accent', LATE: 'bg-warn' };
 
 export type BondTermsProps = {
   amountCents: number;
@@ -26,11 +27,12 @@ export type BondTermsProps = {
   payoutFrequency: PayoutFrequency;
   curatorFeeBps: number | null;
   maturityDate: Date | null;
+  showRate?: boolean;
 };
 
 export function BondTerms(props: BondTermsProps) {
   const rows = [
-    ['Fixed annual rate', formatRate(props.rateBps)],
+    ...(props.showRate === false ? [] : [['Fixed annual rate', formatRate(props.rateBps)]]),
     ['Raise', formatUsd(props.amountCents)],
     ['Term', `${props.termMonths} months`],
     ['Payouts', FREQUENCY_LABEL[props.payoutFrequency]],
@@ -38,11 +40,11 @@ export function BondTerms(props: BondTermsProps) {
     ['Maturity', props.maturityDate ? formatDate(props.maturityDate) : 'Set when fully funded'],
   ];
   return (
-    <dl className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+    <dl className="grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-3">
       {rows.map(([label, value]) => (
         <div key={label}>
-          <dt className="text-xs text-muted">{label}</dt>
-          <dd className="mt-0.5 font-medium">{value}</dd>
+          <dt className="text-[13px] text-muted">{label}</dt>
+          <dd className="mt-0.5 text-[17px] font-medium tracking-[-0.01em]">{value}</dd>
         </div>
       ))}
     </dl>
@@ -52,10 +54,12 @@ export function BondTerms(props: BondTermsProps) {
 export function FundingProgress({ fundedCents, amountCents }: { fundedCents: number; amountCents: number }) {
   const pct = fundedPct(fundedCents, amountCents);
   return (
-    <div className="grid gap-2">
-      <p className="text-sm">
-        <span className="font-medium">{formatUsd(fundedCents)}</span>
-        <span className="text-muted"> of {formatUsd(amountCents)} raised · {pct}%</span>
+    <div className="grid gap-3">
+      <p>
+        <span className="block font-[family-name:var(--font-display)] text-[28px] leading-tight font-semibold tracking-[-0.02em]">
+          {formatUsd(fundedCents)}
+        </span>
+        <span className="text-[13px] text-muted">of {formatUsd(amountCents)} raised · {pct}%</span>
       </p>
       <ProgressBar pct={pct} label="Funding progress" />
     </div>
@@ -74,7 +78,7 @@ export type ScheduleRow = {
 
 export function ScheduleTable({ rows }: { rows: ScheduleRow[] }) {
   if (rows.length === 0) {
-    return <p className="text-sm text-muted">No distributions scheduled yet.</p>;
+    return <p className="text-muted">No distributions scheduled yet.</p>;
   }
   return (
     <div className={tableWrapClass}>
@@ -97,7 +101,10 @@ export function ScheduleTable({ rows }: { rows: ScheduleRow[] }) {
               <td className={tdClass}>{formatUsd(row.amountCents)}</td>
               <td className={tdClass}>{row.isPrincipal ? 'Interest + principal' : 'Interest'}</td>
               <td className={`${tdClass} ${row.status === 'SCHEDULED' ? 'text-muted' : ''}`}>
-                {DISTRIBUTION_LABEL[row.status]}
+                <span className="inline-flex items-center gap-2">
+                  <span aria-hidden className={`size-2 rounded-full ${STATUS_DOT[row.status]}`} />
+                  {DISTRIBUTION_LABEL[row.status]}
+                </span>
                 {row.paidAt && <span className="text-muted"> · {formatDate(row.paidAt)}</span>}
               </td>
             </tr>
@@ -117,18 +124,21 @@ export const toChainRows = (rows: (Omit<ChainRow, 'type'> & { type: string })[])
   rows.map((row) => ({ ...row, type: parseEnum(CHAIN_EVENT_TYPES, row.type) }));
 
 export function ChainRecord({ events }: { events: ChainRow[] }) {
-  if (events.length === 0) return <p className="text-sm text-muted">No on-chain events yet.</p>;
+  if (events.length === 0) return <p className="text-muted">No on-chain events yet.</p>;
   return (
-    <ol className="grid gap-3">
+    <ol className="grid">
       {events.map((event) => (
-        <li key={event.id} className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-line pb-3 last:border-b-0">
-          <span className="text-sm font-medium">{EVENT_LABEL[event.type]}</span>
-          <span className="text-xs text-muted">{formatDate(event.createdAt)}</span>
-          <span className="w-full font-mono text-xs text-muted" title={event.txHash}>tx {shortHash(event.txHash)}</span>
+        <li
+          key={event.id}
+          className="grid grid-cols-[1fr_auto] gap-x-4 gap-y-0.5 border-b border-line py-3.5 first:pt-0 last:border-b-0 last:pb-0"
+        >
+          <span className="font-medium">{EVENT_LABEL[event.type]}</span>
+          <span className="text-[13px] text-muted">{formatDate(event.createdAt)}</span>
+          <span className="font-mono text-[12px] text-muted" title={event.txHash}>tx {shortHash(event.txHash)}</span>
           <span
             aria-disabled="true"
             title="Simulated record: not on a real network"
-            className="text-xs text-accent underline decoration-dotted underline-offset-2"
+            className="text-[13px] text-accent"
           >
             View on explorer (simulated)
           </span>

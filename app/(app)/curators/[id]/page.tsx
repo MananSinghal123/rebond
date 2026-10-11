@@ -22,16 +22,16 @@ export default async function CuratorProfilePage({ params }: { params: Promise<{
         <Stat label="Bonds curated" value={profile.bondsCurated} />
         <Stat label="Total volume" value={formatUsd(profile.totalVolumeCents)} />
       </div>
-      <p className="text-sm text-muted">
+      <p className="text-muted">
         Late distributions: {rank.lateCount}. The score is the share of distributions paid on time, weighted by bond size.
       </p>
       <Panel title="Curated bonds">
         {profile.bonds.length === 0 ? (
-          <p className="text-sm text-muted">No bonds listed yet.</p>
+          <p className="text-muted">No bonds listed yet.</p>
         ) : (
           <ul className="grid gap-2">
             {profile.bonds.map((bond) => (
-              <li key={bond.id} className="flex flex-wrap items-center justify-between gap-3 text-sm">
+              <li key={bond.id} className="flex flex-wrap items-center justify-between gap-3">
                 <Link href={`/bonds/${bond.id}`} className="hover:underline">
                   {bond.companyName} · {formatUsd(bond.amountCents)} · {formatRate(bond.rateBps)} · {bond.termMonths} mo
                 </Link>

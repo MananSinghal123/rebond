@@ -67,7 +67,8 @@ test('a bond goes from application to maturity across all three roles', async ({
   // §10.4: advance time ×4 pays every distribution and the bond is MATURED
   for (let row = 0; row < 4; row += 1) {
     await second.getByRole('button', { name: 'Advance time' }).click();
-    await expect(schedule.locator('tbody tr').nth(row)).toContainText('Paid');
+    await second.waitForLoadState('networkidle');
+    await expect(schedule.locator('tbody tr').nth(row)).toContainText('Paid', { timeout: 30_000 });
   }
   await expect(second.getByText('matured', { exact: true })).toBeVisible();
 

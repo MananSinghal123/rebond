@@ -41,9 +41,9 @@ export default async function ReviewPage({
       </Panel>
 
       <Panel title="Backing contracts">
-        <p className="whitespace-pre-line text-sm">{bond.contractSummary}</p>
-        <p className="mt-3 text-sm text-muted">Annual contracted revenue: {formatUsd(bond.annualRevenueCents)}</p>
-        <ul className="mt-3 grid gap-1 text-sm">
+        <p className="whitespace-pre-line">{bond.contractSummary}</p>
+        <p className="mt-3 text-muted">Annual contracted revenue: {formatUsd(bond.annualRevenueCents)}</p>
+        <ul className="mt-3 grid gap-1">
           {bond.documents.map((doc) => (
             <li key={doc.id}>{doc.name} <span className="text-muted">· {Math.ceil(doc.sizeBytes / 1024)} KB</span></li>
           ))}
@@ -51,7 +51,7 @@ export default async function ReviewPage({
         </ul>
       </Panel>
 
-      {!canDecide && <p className="text-sm text-muted">Claim this application from the queue to decide on it.</p>}
+      {!canDecide && <p className="text-muted">Claim this application from the queue to decide on it.</p>}
 
       {canDecide && (
         <div className="grid gap-4 md:grid-cols-3">

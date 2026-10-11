@@ -50,7 +50,7 @@ export function FundForm({ action, bondId, rateBps, termMonths, remainingCents }
           className={inputClass}
         />
       </Field>
-      {amountUsd !== '' && problem && <p className="text-xs text-bad">{problem}</p>}
+      {amountUsd !== '' && problem && <p className="text-[13px] text-bad">{problem}</p>}
       <Button type="button" disabled={problem !== null} onClick={() => dialog.current?.showModal()}>
         Review investment
       </Button>
@@ -58,21 +58,23 @@ export function FundForm({ action, bondId, rateBps, termMonths, remainingCents }
       <dialog
         ref={dialog}
         aria-labelledby="confirm-title"
-        className="m-auto w-[min(28rem,calc(100%-2rem))] rounded-lg border border-line bg-surface p-6 text-ink backdrop:bg-ink/40"
+        className="sheet-in m-auto w-[min(26rem,calc(100%-2rem))] rounded-[22px] bg-surface p-7 text-ink shadow-float"
       >
-        <h2 id="confirm-title" className="text-lg font-semibold">Confirm investment</h2>
-        <dl className="mt-4 grid grid-cols-2 gap-y-2 text-sm">
+        <h2 id="confirm-title" className="text-[21px] font-semibold tracking-[-0.02em]">Confirm investment</h2>
+        <p className="mt-5 text-[13px] text-muted">Total at maturity</p>
+        <p className="font-[family-name:var(--font-display)] text-[40px] leading-tight font-semibold tracking-[-0.03em]">
+          {formatUsd((principal || 0) + interest)}
+        </p>
+        <dl className="mt-5 grid grid-cols-2 gap-y-2.5 border-t border-line pt-5">
           <dt className="text-muted">Principal</dt>
           <dd className="text-right">{formatUsd(principal || 0)}</dd>
           <dt className="text-muted">Fixed rate · term</dt>
           <dd className="text-right">{formatRate(rateBps)} · {termMonths} months</dd>
           <dt className="text-muted">Expected return</dt>
-          <dd className="text-right font-medium">{formatUsd(interest)}</dd>
-          <dt className="text-muted">Total at maturity</dt>
-          <dd className="text-right font-medium">{formatUsd((principal || 0) + interest)}</dd>
+          <dd className="text-right font-medium text-accent">{formatUsd(interest)}</dd>
         </dl>
-        <p className="mt-3 text-xs text-muted">Expected return = principal × rate × term ÷ 12. Demo only: no real funds move.</p>
-        <div className="mt-6 flex justify-end gap-3">
+        <p className="mt-4 text-[13px] text-muted">Expected return = principal × rate × term ÷ 12. Demo only: no real funds move.</p>
+        <div className="mt-7 grid grid-cols-2 gap-3">
           <Button type="button" variant="secondary" onClick={() => dialog.current?.close()}>Cancel</Button>
           <Button type="submit">Confirm and fund</Button>
         </div>

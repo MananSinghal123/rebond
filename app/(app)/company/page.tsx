@@ -30,7 +30,7 @@ export default async function CompanyDashboard() {
       />
       {company.bonds.length === 0 && (
         <EmptyState title="No applications yet">
-          <p className="text-sm text-muted">Apply with your raise amount, rate and term. A curator reviews it before investors see it.</p>
+          <p className="text-muted">Apply with your raise amount, rate and term. A curator reviews it before investors see it.</p>
           <ButtonLink href="/company/apply">Apply to raise a bond</ButtonLink>
         </EmptyState>
       )}
@@ -48,7 +48,7 @@ export default async function CompanyDashboard() {
                   <StatusBadge status={status} />
                 </div>
                 {bond.reviewNote && (
-                  <p className="mt-3 rounded-md bg-paper px-3 py-2 text-sm">
+                  <p className="mt-3 rounded-xl bg-paper px-3 py-2">
                     <span className="text-muted">Curator note: </span>
                     {bond.reviewNote}
                   </p>
@@ -59,7 +59,7 @@ export default async function CompanyDashboard() {
                   </div>
                 )}
                 {nextDistribution && (
-                  <p className="mt-3 text-sm text-muted">
+                  <p className="mt-3 text-muted">
                     Next distribution {formatUsd(nextDistribution.amountCents)} due {formatDate(nextDistribution.dueDate)}
                   </p>
                 )}

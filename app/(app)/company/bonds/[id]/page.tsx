@@ -33,7 +33,7 @@ export default async function CompanyBondPage({ params }: { params: Promise<{ id
 
       {bond.reviewNote && (
         <Panel title={`Note from ${bond.curator?.displayName ?? 'curator'}`}>
-          <p className="text-sm">{bond.reviewNote}</p>
+          <p>{bond.reviewNote}</p>
         </Panel>
       )}
 
@@ -73,7 +73,7 @@ export default async function CompanyBondPage({ params }: { params: Promise<{ id
 
       {bond.documents.length > 0 && (
         <Panel title="Supporting documents">
-          <ul className="grid gap-1 text-sm">
+          <ul className="grid gap-1">
             {bond.documents.map((doc) => (
               <li key={doc.id}>
                 {doc.name} <span className="text-muted">· {Math.ceil(doc.sizeBytes / 1024)} KB</span>

@@ -1,0 +1,137 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Enum-like String columns hold values from lib/domain/types.ts because SQLite has no enums.
+
+model User {
+  id            String     @id @default(cuid())
+  email         String     @unique
+  passwordHash  String
+  role          String?
+  walletAddress String?
+  verified      Boolean    @default(false)
+  createdAt     DateTime   @default(now())
+  company       Company?
+  curator       Curator?
+  positions     Position[]
+}
+
+model Company {
+  id          String @id @default(cuid())
+  ownerId     String @unique
+  owner       User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  name        String
+  sector      String @default("HEALTHCARE")
+  description String @default("")
+  bonds       Bond[]
+}
+
+model Curator {
+  id          String @id @default(cuid())
+  userId      String @unique
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  displayName String
+  bio         String @default("")
+  bonds       Bond[]
+}
+
+model Bond {
+  id                 String         @id @default(cuid())
+  companyId          String
+  company            Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  curatorId          String?
+  curator            Curator?       @relation(fields: [curatorId], references: [id])
+  status             String         @default("DRAFT")
+  amountCents        Int
+  fundedCents        Int            @default(0)
+  rateBps            Int
+  termMonths         Int
+  payoutFrequency    String
+  curatorFeeBps      Int?
+  contractSummary    String
+  annualRevenueCents Int
+  reviewNote         String?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  listedAt           DateTime?
+  fundedAt           DateTime?
+  maturityDate       DateTime?
+  documents          Document[]
+  positions          Position[]
+  distributions      Distribution[]
+  chainEvents        ChainEvent[]
+
+  @@index([status])
+}
+
+model Document {
+  id        String   @id @default(cuid())
+  bondId    String
+  bond      Bond     @relation(fields: [bondId], references: [id], onDelete: Cascade)
+  name      String
+  sizeBytes Int
+  data      Bytes
+  createdAt DateTime @default(now())
+}
+
+model Position {
+  id          String   @id @default(cuid())
+  bondId      String
+  bond        Bond     @relation(fields: [bondId], references: [id], onDelete: Cascade)
+  investorId  String
+  investor    User     @relation(fields: [investorId], references: [id], onDelete: Cascade)
+  amountCents Int
+  txHash      String
+  createdAt   DateTime @default(now())
+  payouts     Payout[]
+
+  @@index([investorId])
+  @@index([bondId])
+}
+
+model Distribution {
+  id          String    @id @default(cuid())
+  bondId      String
+  bond        Bond      @relation(fields: [bondId], references: [id], onDelete: Cascade)
+  seq         Int
+  dueDate     DateTime
+  amountCents Int
+  isPrincipal Boolean   @default(false)
+  status      String    @default("SCHEDULED")
+  paidAt      DateTime?
+  txHash      String?
+  payouts     Payout[]
+
+  @@unique([bondId, seq])
+  @@index([status, dueDate])
+}
+
+model Payout {
+  id             String       @id @default(cuid())
+  distributionId String
+  distribution   Distribution @relation(fields: [distributionId], references: [id], onDelete: Cascade)
+  positionId     String
+  position       Position     @relation(fields: [positionId], references: [id], onDelete: Cascade)
+  amountCents    Int
+
+  @@unique([distributionId, positionId])
+  @@index([positionId])
+}
+
+model ChainEvent {
+  id          Int      @id @default(autoincrement())
+  bondId      String
+  bond        Bond     @relation(fields: [bondId], references: [id], onDelete: Cascade)
+  type        String
+  payloadHash String
+  txHash      String
+  createdAt   DateTime
+
+  @@index([bondId])
+}

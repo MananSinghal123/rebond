@@ -1,3 +1,4 @@
+import { fundBond } from '@/lib/services/funding';
 import { saveApplication } from '@/lib/services/applications';
 import { claimApplication, decideApplication } from '@/lib/services/review';
 import { chooseRole, signUp } from '@/lib/services/accounts';
@@ -41,4 +42,13 @@ export async function makeListedBond(fields: Partial<typeof DEMO_APPLICATION> = 
   unwrap(await claimApplication(curator, bondId));
   unwrap(await decideApplication(curator, bondId, { kind: 'APPROVE', feeBps: 100, note: '' }, now));
   return { bondId, company, curator };
+}
+
+export async function makeActiveBond(fundedAt = new Date('2026-10-10T00:00:00Z')) {
+  const listed = await makeListedBond({}, fundedAt);
+  const first = await makeActor('INVESTOR');
+  const second = await makeActor('INVESTOR');
+  unwrap(await fundBond(first, listed.bondId, 15_000_000, fundedAt));
+  unwrap(await fundBond(second, listed.bondId, 10_000_000, fundedAt));
+  return { ...listed, investors: [first, second] as const };
 }

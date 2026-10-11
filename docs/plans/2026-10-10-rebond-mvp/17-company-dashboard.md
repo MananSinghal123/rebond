@@ -216,7 +216,7 @@ export default async function CompanyDashboard() {
                   <StatusBadge status={status} />
                 </div>
                 {bond.reviewNote && (
-                  <p className="mt-3 border-l-2 border-warn/40 pl-3 text-sm">
+                  <p className="mt-3 rounded-md bg-paper px-3 py-2 text-sm">
                     <span className="text-muted">Curator note: </span>
                     {bond.reviewNote}
                   </p>

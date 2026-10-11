@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { requireRole } from '@/lib/auth/session';
 import { Button, EmptyState, Field, FREQUENCY_LABEL, inputClass, PageHeader, ProgressBar } from '@/components/ui';
 import { formatRate, formatUsd } from '@/lib/domain/money';
 import { listBonds, listCuratorOptions, parseFilters, type BondCard } from '@/lib/services/marketplace';
@@ -46,6 +47,7 @@ export default async function BondsPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  await requireRole();
   const filters = parseFilters(await searchParams);
   const [bonds, curators] = await Promise.all([listBonds(filters), listCuratorOptions()]);
 

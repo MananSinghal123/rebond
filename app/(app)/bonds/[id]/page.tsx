@@ -3,9 +3,9 @@ import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { BondTerms, ChainRecord, FundingProgress, ScheduleTable, toChainRows, toScheduleRows } from '@/components/bond-panels';
 import { FundForm } from '@/components/fund-form';
-import { Button, ButtonLink, Notice, PageHeader, Panel, shortHash, StatusBadge } from '@/components/ui';
+import { Button, Notice, PageHeader, Panel, shortHash, StatusBadge } from '@/components/ui';
 import type { Session } from '@/lib/auth/edge';
-import { getSession } from '@/lib/auth/session';
+import { requireRole } from '@/lib/auth/session';
 import { db } from '@/lib/db';
 import { PUBLIC_STATUSES } from '@/lib/domain/lifecycle';
 import { formatRate } from '@/lib/domain/money';
@@ -14,10 +14,9 @@ import { getCuratorRanks } from '@/lib/services/curators';
 import { devToolsEnabled } from '@/lib/auth/dev-tools';
 import { advanceTimeAction, attestAction, fundAction } from './actions';
 
-type FundingGate = 'sign-in' | 'not-investor' | 'unverified' | 'can-fund';
+type FundingGate = 'not-investor' | 'unverified' | 'can-fund';
 
-async function fundingGate(session: Session | null): Promise<FundingGate> {
-  if (!session) return 'sign-in';
+async function fundingGate(session: Session): Promise<FundingGate> {
   if (session.role !== 'INVESTOR') return 'not-investor';
   const investor = await db.user.findUniqueOrThrow({ where: { id: session.userId }, select: { verified: true } });
   return investor.verified ? 'can-fund' : 'unverified';
@@ -46,7 +45,7 @@ export default async function BondPage({
   params: Promise<{ id: string }>;
   searchParams: Promise<{ error?: string; funded?: string }>;
 }) {
-  const [{ id }, { error, funded }, session] = await Promise.all([params, searchParams, getSession()]);
+  const [{ id }, { error, funded }, session] = await Promise.all([params, searchParams, requireRole()]);
   const bond = await db.bond.findUnique({
     where: { id },
     include: {
@@ -66,7 +65,6 @@ export default async function BondPage({
   const showAdvanceTime = status === 'ACTIVE' && session !== null && devToolsEnabled();
 
   const fundingPanel: Record<FundingGate, ReactNode> = {
-    'sign-in': <ButtonLink href={`/login?next=/bonds/${bond.id}`}>Sign in to invest</ButtonLink>,
     'not-investor': <p className="text-muted">Only investor accounts can fund bonds.</p>,
     unverified: (
       <form action={attestAction} className="grid gap-3">

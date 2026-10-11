@@ -29,6 +29,9 @@ export const CHAIN_EVENT_TYPES = [
 ] as const;
 export type ChainEventType = (typeof CHAIN_EVENT_TYPES)[number];
 
+export const WALLET_KINDS = ['EXTERNAL', 'EMBEDDED_DEMO'] as const;
+export type WalletKind = (typeof WALLET_KINDS)[number];
+
 export type Cents = number;
 export type Bps = number;
 

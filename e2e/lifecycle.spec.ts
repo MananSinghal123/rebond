@@ -7,6 +7,7 @@ const ROLE_HOME_GLOB: Record<RoleName, string> = { Investor: '**/portfolio', Com
 async function signUpAs(browser: Browser, email: string, role: RoleName, displayName = ''): Promise<Page> {
   const page = await (await browser.newContext()).newPage();
   await page.goto('/login');
+  await page.getByText('Use email and password instead').click();
   await page.getByLabel('Email').fill(email);
   await page.getByLabel('Password').fill('correct horse battery');
   await page.getByRole('button', { name: 'Create account' }).click();

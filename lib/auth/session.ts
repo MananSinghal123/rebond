@@ -31,6 +31,12 @@ export async function requireSession(): Promise<Session> {
   return session;
 }
 
+export async function requireRole(): Promise<Session & { role: Role }> {
+  const session = await requireSession();
+  if (session.role === null) redirect('/onboarding');
+  return { userId: session.userId, role: session.role };
+}
+
 export async function requireActor(role: Role): Promise<Actor> {
   const session = await requireSession();
   if (session.role !== role) redirect('/');

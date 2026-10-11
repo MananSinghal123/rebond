@@ -94,6 +94,8 @@ None emitted as `00-drift-*.md`. This is a greenfield repo, so each correction w
 
 | Spec | Plan | Why |
 |---|---|---|
+| Public `/bonds`, `/bonds/[id]`, `/curators/[id]` (§3, §6) | Sign-in required everywhere except `/` and `/privacy`; "Open the app" goes to `entryPath(session)` | Product owner request, 2026-10-11 |
+| Mock wallet connect (FR-5) | Real CIP-30 wallet sign-in and linking (Lace, Eternl), with a server-verified signed nonce. "Continue with Google" is a labelled demo that creates a demo embedded wallet. Email/password is kept as a secondary option | Product owner request, 2026-10-11. Real Google + embedded wallet (UTXOS) is the swap point in `signInWithGoogleDemo` |
 | Auth.js (NextAuth v5) | Email and password with bcrypt, plus a `jose`-signed httpOnly cookie | §7 allows a credentials provider for the demo. A 60-line edge-safe session avoids Auth.js v5 split-config and role-refresh complexity. Swap it in during Phase 2. |
 | shadcn/ui | One `components/ui.tsx` (Button, Field, Panel, Notice, Stat, StatusBadge, ProgressBar) on Tailwind v4 tokens | The product owner asked for a very simple frontend. A few hand-written primitives are easier to keep consistent than a generated component tree. |
 | `Document.url` | `Document.data Bytes` + `sizeBytes` | FR-8 says "stored only". Bytes in the DB work on Vercel, where the filesystem is read-only. |

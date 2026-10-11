@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { routeAccess, signSession, verifySession } from '@/lib/auth/edge';
+import { entryPath, routeAccess, signSession, verifySession } from '@/lib/auth/edge';
 
 const investor = { userId: 'u1', role: 'INVESTOR' as const };
 
@@ -26,9 +26,9 @@ describe('role-protected routes redirect the wrong visitors', () => {
     });
   });
 
-  describe('when anyone opens a public curator profile under /curators', () => {
+  describe('when an investor opens a curator profile under /curators', () => {
     it('allows it even though the path starts with /curator', () => {
-      expect(routeAccess('/curators/c1', null)).toEqual({ kind: 'allow' });
+      expect(routeAccess('/curators/c1', investor)).toEqual({ kind: 'allow' });
     });
   });
 
@@ -36,6 +36,44 @@ describe('role-protected routes redirect the wrong visitors', () => {
     it('allows it', () => {
       expect(routeAccess('/portfolio', investor)).toEqual({ kind: 'allow' });
     });
+  });
+});
+
+describe('the marketplace and curator pages are for signed-in members only', () => {
+  describe('when a visitor without a session opens the marketplace or a curator profile', () => {
+    it('redirects to login and remembers the page', () => {
+      expect(routeAccess('/bonds', null)).toEqual({ kind: 'redirect', to: '/login?next=%2Fbonds' });
+      expect(routeAccess('/bonds/b1', null)).toEqual({ kind: 'redirect', to: '/login?next=%2Fbonds%2Fb1' });
+      expect(routeAccess('/curators/c1', null)).toEqual({ kind: 'redirect', to: '/login?next=%2Fcurators%2Fc1' });
+    });
+  });
+
+  describe('when a signed-in user has not picked a role yet', () => {
+    it('sends them to onboarding before the marketplace', () => {
+      expect(routeAccess('/bonds', { userId: 'u1', role: null })).toEqual({ kind: 'redirect', to: '/onboarding' });
+    });
+  });
+
+  describe('when any member with a role opens the marketplace', () => {
+    it('allows curators, companies and investors alike', () => {
+      for (const role of ['CURATOR', 'COMPANY', 'INVESTOR'] as const) {
+        expect(routeAccess('/bonds', { userId: 'u1', role })).toEqual({ kind: 'allow' });
+      }
+    });
+  });
+});
+
+describe('"Open the app" takes each person to the right first screen', () => {
+  it('sends visitors to login', () => {
+    expect(entryPath(null)).toBe('/login');
+  });
+
+  it('sends role-less members to onboarding', () => {
+    expect(entryPath({ userId: 'u1', role: null })).toBe('/onboarding');
+  });
+
+  it("sends members to their role's home", () => {
+    expect(entryPath({ userId: 'u1', role: 'COMPANY' })).toBe('/company');
   });
 });
 

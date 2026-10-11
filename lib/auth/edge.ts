@@ -12,10 +12,14 @@ export const ROLE_HOME: Record<Role, string> = {
   CURATOR: '/curator',
 };
 
-const PROTECTED: readonly { prefix: string; role: Role | 'ANY' }[] = [
+type RouteRule = Role | 'ANY' | 'ANY_ROLE';
+
+const PROTECTED: readonly { prefix: string; role: RouteRule }[] = [
   { prefix: '/portfolio', role: 'INVESTOR' },
   { prefix: '/company', role: 'COMPANY' },
   { prefix: '/curator', role: 'CURATOR' },
+  { prefix: '/bonds', role: 'ANY_ROLE' },
+  { prefix: '/curators', role: 'ANY_ROLE' },
   { prefix: '/onboarding', role: 'ANY' },
 ];
 
@@ -27,11 +31,18 @@ export function routeAccess(pathname: string, session: Session | null): Access {
   if (!session) return { kind: 'redirect', to: `/login?next=${encodeURIComponent(pathname)}` };
   if (rule.role === 'ANY') return { kind: 'allow' };
   if (session.role === null) return { kind: 'redirect', to: '/onboarding' };
+  if (rule.role === 'ANY_ROLE') return { kind: 'allow' };
   if (session.role !== rule.role) return { kind: 'redirect', to: ROLE_HOME[session.role] };
   return { kind: 'allow' };
 }
 
-function secretKey() {
+export function entryPath(session: Session | null): string {
+  if (!session) return '/login';
+  if (session.role === null) return '/onboarding';
+  return ROLE_HOME[session.role];
+}
+
+export function secretKey() {
   const secret = process.env.SESSION_SECRET;
   assert(secret && secret.length >= 32, 'SESSION_SECRET must be at least 32 characters');
   return new TextEncoder().encode(secret);

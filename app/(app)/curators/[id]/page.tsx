@@ -1,11 +1,12 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { requireRole } from '@/lib/auth/session';
 import { PageHeader, Panel, Stat, StatusBadge } from '@/components/ui';
 import { formatRate, formatUsd } from '@/lib/domain/money';
 import { getCuratorProfile } from '@/lib/services/curators';
 
 export default async function CuratorProfilePage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+  const [{ id }] = await Promise.all([params, requireRole()]);
   const profile = await getCuratorProfile(id);
   if (!profile) notFound();
   const { rank } = profile;

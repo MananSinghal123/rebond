@@ -29,6 +29,7 @@ The app is used as a demo in pitch settings and by testers walking the §10 scri
 
 - The existing features, routes, server actions and the Playwright lifecycle test stay unchanged. Visual work is presentation only (confirmed 2026-10-11).
 - "Demo: no real funds, simulated on-chain records." must be visible on every app page (REQUIREMENTS NFR-5).
+- Public pages are the landing page and privacy only. Everything else needs sign-in. Ways in, in this order: Continue with Google (demo, which creates a demo embedded wallet), connect a Cardano wallet (real CIP-30), then email and password (confirmed 2026-10-11).
 - Money is integer cents and rates are basis points. Amounts are capped at $8M in this demo.
 - Open, undecided: payout currency (USDM vs fiat), the curator fee model, and accreditation rules.
 

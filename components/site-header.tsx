@@ -1,15 +1,14 @@
 import Link from 'next/link';
-import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { NavLinks, type NavItem } from '@/components/nav-links';
 import { Button, ButtonLink, shortHash } from '@/components/ui';
-import { endSession, getSession, requireSession } from '@/lib/auth/session';
+import { WalletConnect } from '@/components/wallet-connect';
+import { endSession, getSession } from '@/lib/auth/session';
 import { db } from '@/lib/db';
 import type { Role } from '@/lib/domain/types';
-import { connectWallet } from '@/lib/services/accounts';
 
 const NAV: Record<Role | 'VISITOR', NavItem[]> = {
-  VISITOR: [{ href: '/bonds', label: 'Bonds' }],
+  VISITOR: [],
   INVESTOR: [
     { href: '/bonds', label: 'Bonds' },
     { href: '/portfolio', label: 'Portfolio' },
@@ -30,17 +29,10 @@ async function signOut() {
   redirect('/');
 }
 
-async function connect() {
-  'use server';
-  const session = await requireSession();
-  await connectWallet(session.userId);
-  revalidatePath('/', 'layout');
-}
-
 export async function SiteHeader() {
   const session = await getSession();
   const user = session
-    ? await db.user.findUnique({ where: { id: session.userId }, select: { walletAddress: true } })
+    ? await db.user.findUnique({ where: { id: session.userId }, select: { walletAddress: true, walletKind: true } })
     : null;
   const items = NAV[session?.role ?? 'VISITOR'];
 
@@ -61,15 +53,26 @@ export async function SiteHeader() {
             {user?.walletAddress && (
               <span
                 className="hidden rounded-full bg-fill px-3 py-1.5 font-mono text-[12px] text-muted md:inline"
-                title={user.walletAddress}
+                title={user.walletKind === 'EMBEDDED_DEMO' ? `Demo embedded wallet: ${user.walletAddress}` : user.walletAddress}
               >
+                {user.walletKind === 'EMBEDDED_DEMO' && <span className="mr-1.5 font-sans text-ink/70">Demo wallet</span>}
                 {shortHash(user.walletAddress)}
               </span>
             )}
             {user && !user.walletAddress && (
-              <form action={connect}>
-                <Button variant="secondary" className="h-8 px-3.5 text-[13px]">Connect wallet</Button>
-              </form>
+              <>
+                <Button variant="secondary" className="h-8 px-3.5 text-[13px]" popoverTarget="wallet-popover">
+                  Connect wallet
+                </Button>
+                <div
+                  id="wallet-popover"
+                  popover="auto"
+                  className="sheet-in fixed inset-auto top-16 right-4 m-0 w-[min(22rem,calc(100%-2rem))] rounded-[18px] bg-surface p-5 text-ink shadow-float"
+                >
+                  <p className="mb-3 text-[15px] font-semibold">Connect a Cardano wallet</p>
+                  <WalletConnect mode="link" />
+                </div>
+              </>
             )}
             {user ? (
               <form action={signOut}>

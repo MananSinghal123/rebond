@@ -12,6 +12,8 @@ pnpm db:push && pnpm db:seed    # every seeded account uses the password "rebond
 pnpm dev                        # http://localhost:3000
 ```
 
+Sign-in options: **Continue with Google** (a demo that creates an account plus a demo embedded wallet), **connect a Cardano wallet** (real CIP-30: install Lace or Eternl, preferably on preprod, and sign a one-time message with no transaction or fee), or email and password.
+
 Seeded accounts: `northwind@`, `harbor@`, `meridian@` (companies), `atlas@`, `juniper@` (curators), and `investor1@` to `investor3@`, all `@rebond.demo`.
 
 ## Test

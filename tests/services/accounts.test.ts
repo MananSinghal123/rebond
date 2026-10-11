@@ -1,9 +1,18 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { clearDatabase, db } from '@/lib/db';
-import { attestInvestor, chooseRole, connectWallet, signIn, signUp } from '@/lib/services/accounts';
+import {
+  attestInvestor,
+  chooseRole,
+  linkWallet,
+  signIn,
+  signInWithGoogleDemo,
+  signInWithWallet,
+  signUp,
+} from '@/lib/services/accounts';
 import { unwrap } from '@/lib/domain/types';
 
 const credentials = { email: 'Ana@Clinic.test', password: 'correct horse battery' };
+const WALLET = 'addr1qxtu4w2rq2mdguw4fkms2ge4m070nq8cmlyjfhghwlh8sjscnp7pvysxn4qgpg8ty3uzpjuc0l4gr0w74t7ag8uev2qseuyw6u';
 
 describe('people sign up with email and pick one role', () => {
   beforeEach(clearDatabase);
@@ -88,13 +97,57 @@ describe('people sign up with email and pick one role', () => {
     });
   });
 
-  describe('when the user connects a wallet', () => {
-    it('stores a fake addr1 address on the profile', async () => {
+  describe('when an email user links a Cardano wallet', () => {
+    it('stores the verified address as their external wallet', async () => {
       const user = unwrap(await signUp(credentials));
-      const address = await connectWallet(user.id);
+      unwrap(await linkWallet(user.id, WALLET));
       const stored = await db.user.findUniqueOrThrow({ where: { id: user.id } });
-      expect(address).toMatch(/^addr1q/);
-      expect(stored.walletAddress).toBe(address);
+      expect(stored).toMatchObject({ walletAddress: WALLET, walletKind: 'EXTERNAL' });
+    });
+  });
+
+  describe('when the wallet already belongs to another account', () => {
+    it('refuses to link it twice', async () => {
+      unwrap(await signInWithWallet(WALLET));
+      const user = unwrap(await signUp(credentials));
+      expect(await linkWallet(user.id, WALLET)).toEqual({
+        ok: false,
+        error: 'This wallet is already linked to another account.',
+      });
+    });
+  });
+});
+
+describe('people can start with a Cardano wallet or Google instead of a password', () => {
+  beforeEach(clearDatabase);
+
+  describe('when a wallet signs in for the first time and again later', () => {
+    it('creates one account and returns it on every later sign-in', async () => {
+      const first = unwrap(await signInWithWallet(WALLET));
+      const again = unwrap(await signInWithWallet(WALLET));
+      expect(first).toEqual({ id: again.id, role: null });
+      expect(await db.user.count()).toBe(1);
+    });
+  });
+
+  describe('when someone continues with Google (demo)', () => {
+    it('creates the account with a demo embedded wallet and finds it again by email', async () => {
+      const created = unwrap(await signInWithGoogleDemo({ email: 'Lee@Example.test', name: 'Lee' }));
+      const again = unwrap(await signInWithGoogleDemo({ email: 'lee@example.test', name: 'Lee' }));
+      const stored = await db.user.findUniqueOrThrow({ where: { id: created.id } });
+      expect(again.id).toBe(created.id);
+      expect(stored).toMatchObject({ email: 'lee@example.test', walletKind: 'EMBEDDED_DEMO', passwordHash: null });
+      expect(stored.walletAddress).toMatch(/^addr1q/);
+    });
+  });
+
+  describe('when a passwordless account tries the email form', () => {
+    it('rejects the password sign-in', async () => {
+      unwrap(await signInWithGoogleDemo({ email: 'lee@example.test', name: 'Lee' }));
+      expect(await signIn({ email: 'lee@example.test', password: 'anything-goes' })).toEqual({
+        ok: false,
+        error: 'Email or password is incorrect.',
+      });
     });
   });
 });

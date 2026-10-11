@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { ButtonLink, ProgressBar } from '@/components/ui';
+import { entryPath } from '@/lib/auth/edge';
+import { getSession } from '@/lib/auth/session';
 
 const STEPS = [
   { name: 'Apply', body: 'A company with contracted revenue proposes a bond: amount, fixed rate, term and payout schedule.' },
@@ -85,7 +87,8 @@ const PROOFS: { claim: string; body: string; proof: ReactNode }[] = [
   },
 ];
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const appHref = entryPath(await getSession());
   return (
     <main>
       <section className="mx-auto grid max-w-[1080px] justify-items-center gap-6 px-5 pt-20 pb-24 text-center md:pt-28">
@@ -96,7 +99,7 @@ export default function LandingPage() {
           Fixed-return bonds backed by contracted revenue. Curated by people with their name on the line, and recorded on Cardano.
         </p>
         <div className="rise-in flex flex-wrap justify-center gap-3 [animation-delay:180ms]">
-          <ButtonLink href="/bonds" className="h-11 px-6 text-[17px]">Open the app</ButtonLink>
+          <ButtonLink href={appHref} className="h-11 px-6 text-[17px]">Open the app</ButtonLink>
           <ButtonLink href="#how-it-works" variant="secondary" className="h-11 px-6 text-[17px]">See how it works</ButtonLink>
         </div>
         <div className="hero-settle mt-12 w-full">

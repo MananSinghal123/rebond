@@ -44,7 +44,7 @@ A single Next.js 15 App Router app. Mutations go through server actions, which c
 | Review claim | Review (set) / Applications (cleared on resubmit) | A SUBMITTED bond has no `curatorId` | Same guarded write as the status change |
 
 ## Trust boundaries
-Signed httpOnly JWT cookie (`jose`, HS256). Roles are trusted from the token and re-checked per action. The dev tool needs a session and `DEMO_DEV_TOOLS=1` (private demos only). Uploaded PDFs are untrusted bytes: the `%PDF` magic number and a 5 MB total cap are checked, and they are never rendered.
+Wallet sign-in works like this. The server issues a nonce in a short-lived signed httpOnly cookie (`lib/auth/wallet-challenge.ts`). The wallet signs it through CIP-30 `signData`. The server verifies the COSE signature, the address bound into it, and the message (`lib/auth/wallet-signature.ts`). Only then does it find or create the account. The Google option is a labelled demo. Signed httpOnly JWT cookie (`jose`, HS256). Roles are trusted from the token and re-checked per action. The dev tool needs a session and `DEMO_DEV_TOOLS=1` (private demos only). Uploaded PDFs are untrusted bytes: the `%PDF` magic number and a 5 MB total cap are checked, and they are never rendered.
 
 ## Current drift
 | Area | Drift/evidence | Target state | Status/task | Last reviewed |

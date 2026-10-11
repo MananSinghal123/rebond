@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import { db } from '@/lib/db';
@@ -12,6 +13,18 @@ const Credentials = z.object({
   email: z.string().trim().toLowerCase().email('Enter a valid email address.'),
   password: z.string().min(8, 'Password must be at least 8 characters.'),
 });
+
+const WalletAddress = z.string().regex(/^addr(_test)?1[02-9ac-hj-np-z]+$/, 'That is not a Cardano payment address.');
+
+const GoogleDemoProfile = z.object({
+  email: z.string().trim().toLowerCase().email('Enter a valid email address.'),
+  name: z.string().trim().min(1, 'Enter your name.').max(120),
+});
+
+const roleOf = (role: string | null): Role | null => (role === null ? null : parseEnum(ROLES, role));
+
+const isUniqueViolation = (error: unknown) =>
+  error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002';
 
 const RoleChoice = z.object({
   role: z.enum(ROLES, { message: 'Choose a role.' }),
@@ -37,9 +50,11 @@ export async function signIn(input: unknown): Promise<Result<SessionUser>> {
   const { email, password } = parsed.data;
 
   const user = await db.user.findUnique({ where: { email } });
-  if (!user || !(await bcrypt.compare(password, user.passwordHash))) return fail('Email or password is incorrect.');
+  if (!user?.passwordHash || !(await bcrypt.compare(password, user.passwordHash))) {
+    return fail('Email or password is incorrect.');
+  }
 
-  return ok({ id: user.id, role: user.role === null ? null : parseEnum(ROLES, user.role) });
+  return ok({ id: user.id, role: roleOf(user.role) });
 }
 
 export async function chooseRole(userId: string, input: unknown): Promise<Result<{ id: string; role: Role }>> {
@@ -67,8 +82,47 @@ export async function attestInvestor(actor: Actor): Promise<void> {
   await db.user.update({ where: { id: actor.userId }, data: { verified: true } });
 }
 
-export async function connectWallet(userId: string): Promise<string> {
-  const walletAddress = fakeWalletAddress(userId);
-  await db.user.update({ where: { id: userId }, data: { walletAddress } });
-  return walletAddress;
+export async function signInWithWallet(address: string): Promise<Result<SessionUser>> {
+  const parsed = WalletAddress.safeParse(address);
+  if (!parsed.success) return fail(parsed.error.issues[0].message);
+
+  const user = await db.user.upsert({
+    where: { walletAddress: parsed.data },
+    create: { walletAddress: parsed.data, walletKind: 'EXTERNAL' },
+    update: {},
+  });
+  return ok({ id: user.id, role: roleOf(user.role) });
+}
+
+export async function linkWallet(userId: string, address: string): Promise<Result<string>> {
+  const parsed = WalletAddress.safeParse(address);
+  if (!parsed.success) return fail(parsed.error.issues[0].message);
+
+  const linked = await db.user
+    .updateMany({ where: { id: userId, walletAddress: null }, data: { walletAddress: parsed.data, walletKind: 'EXTERNAL' } })
+    .catch((error: unknown) => {
+      if (isUniqueViolation(error)) return null;
+      throw error;
+    });
+  if (linked === null) return fail('This wallet is already linked to another account.');
+  if (linked.count === 0) return fail('A wallet is already linked to this account.');
+  return ok(parsed.data);
+}
+
+export async function signInWithGoogleDemo(input: unknown): Promise<Result<SessionUser>> {
+  const parsed = GoogleDemoProfile.safeParse(input);
+  if (!parsed.success) return fail(parsed.error.issues[0].message);
+  const { email } = parsed.data;
+
+  const existing = await db.user.findUnique({ where: { email } });
+  if (existing) return ok({ id: existing.id, role: roleOf(existing.role) });
+
+  const user = await db.$transaction(async (tx) => {
+    const created = await tx.user.create({ data: { email } });
+    return tx.user.update({
+      where: { id: created.id },
+      data: { walletAddress: fakeWalletAddress(created.id), walletKind: 'EMBEDDED_DEMO' },
+    });
+  });
+  return ok({ id: user.id, role: null });
 }

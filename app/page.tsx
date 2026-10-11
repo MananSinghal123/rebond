@@ -89,33 +89,35 @@ export default function LandingPage() {
   return (
     <main>
       <section className="mx-auto grid max-w-[1080px] justify-items-center gap-6 px-5 pt-20 pb-24 text-center md:pt-28">
-        <h1 className="max-w-3xl text-[48px] leading-[1.05] font-semibold tracking-[-0.035em] md:text-[80px]">
+        <h1 className="rise-in max-w-3xl text-[48px] leading-[1.05] font-semibold tracking-[-0.035em] md:text-[80px]">
           Real yield from real contracts.
         </h1>
-        <p className="max-w-xl text-[19px] leading-snug text-muted md:text-[21px]">
+        <p className="rise-in max-w-xl text-[19px] leading-snug text-muted [animation-delay:90ms] md:text-[21px]">
           Fixed-return bonds backed by contracted revenue. Curated by people with their name on the line, and recorded on Cardano.
         </p>
-        <div className="flex flex-wrap justify-center gap-3">
+        <div className="rise-in flex flex-wrap justify-center gap-3 [animation-delay:180ms]">
           <ButtonLink href="/bonds" className="h-11 px-6 text-[17px]">Open the app</ButtonLink>
           <ButtonLink href="#how-it-works" variant="secondary" className="h-11 px-6 text-[17px]">See how it works</ButtonLink>
         </div>
-        <div className="mt-12 w-full">
-          <ExampleBondCard />
+        <div className="hero-settle mt-12 w-full">
+          <div className="rise-in [animation-delay:300ms] [animation-duration:1200ms]">
+            <ExampleBondCard />
+          </div>
         </div>
       </section>
 
       <section className="bg-surface py-24">
         <div className="mx-auto max-w-[1080px] px-5">
-          <h2 className="max-w-2xl text-[34px] leading-tight font-semibold tracking-[-0.025em] md:text-[48px]">
+          <h2 className="reveal max-w-2xl text-[34px] leading-tight font-semibold tracking-[-0.025em] md:text-[48px]">
             Credit for revenue that is already signed.
           </h2>
-          <p className="mt-4 max-w-2xl text-[19px] text-muted">
+          <p className="reveal mt-4 max-w-2xl text-[19px] text-muted">
             Companies with recurring contracts still wait on credit priced as if that revenue were uncertain. ReBond turns those contracts into
             fixed-return bonds that investors can read end to end.
           </p>
           <div className="mt-14 grid gap-x-10 gap-y-12 md:grid-cols-3">
-            {PROOFS.map((item) => (
-              <div key={item.claim} className="grid content-start gap-3">
+            {PROOFS.map((item, index) => (
+              <div key={item.claim} className={`reveal grid content-start gap-3 ${index > 0 ? 'reveal-late' : ''}`}>
                 <h3 className="text-[21px] font-semibold tracking-[-0.02em]">{item.claim}</h3>
                 <p className="text-muted">{item.body}</p>
                 <div className="mt-2 rounded-2xl bg-paper p-4">{item.proof}</div>
@@ -126,10 +128,10 @@ export default function LandingPage() {
       </section>
 
       <section id="how-it-works" className="mx-auto max-w-[1080px] scroll-mt-20 px-5 py-24">
-        <h2 className="text-[34px] font-semibold tracking-[-0.025em] md:text-[48px]">How it works.</h2>
+        <h2 className="reveal text-[34px] font-semibold tracking-[-0.025em] md:text-[48px]">How it works.</h2>
         <ol className="mt-12 grid gap-10 md:grid-cols-4 md:gap-8">
           {STEPS.map((step, index) => (
-            <li key={step.name} className="grid content-start gap-3 border-t-2 border-ink pt-5 first:border-accent">
+            <li key={step.name} className="draw-line grid content-start gap-3 border-t-2 border-fill pt-5 first:[--line-color:var(--color-accent)]">
               <span className="text-[13px] font-medium text-muted">Step {index + 1}</span>
               <h3 className="text-[24px] font-semibold tracking-[-0.02em]">{step.name}</h3>
               <p className="text-muted">{step.body}</p>
@@ -140,10 +142,10 @@ export default function LandingPage() {
 
       <section className="bg-surface py-24">
         <div className="mx-auto grid max-w-[1080px] gap-14 px-5 md:grid-cols-[1fr_1.4fr]">
-          <h2 className="text-[34px] font-semibold tracking-[-0.025em] md:text-[48px]">Who it&apos;s for.</h2>
+          <h2 className="reveal text-[34px] font-semibold tracking-[-0.025em] md:text-[48px]">Who it&apos;s for.</h2>
           <dl className="grid gap-8">
             {AUDIENCES.map((audience) => (
-              <div key={audience.name} className="grid gap-1 border-b border-line pb-8 last:border-b-0 last:pb-0">
+              <div key={audience.name} className="reveal grid gap-1 border-b border-line pb-8 last:border-b-0 last:pb-0">
                 <dt className="text-[21px] font-semibold tracking-[-0.02em]">{audience.name}</dt>
                 <dd className="text-[17px] text-muted">{audience.body}</dd>
               </div>
@@ -153,15 +155,15 @@ export default function LandingPage() {
       </section>
 
       <section className="mx-auto max-w-[1080px] px-5 py-24">
-        <h2 className="text-[34px] font-semibold tracking-[-0.025em] md:text-[48px]">Markets.</h2>
+        <h2 className="reveal text-[34px] font-semibold tracking-[-0.025em] md:text-[48px]">Markets.</h2>
         <div className="mt-10 grid gap-5 md:grid-cols-2">
-          <div className="rounded-[22px] bg-surface p-8 shadow-sheet">
+          <div className="reveal rounded-[22px] bg-surface p-8 shadow-sheet">
             <h3 className="text-[24px] font-semibold tracking-[-0.02em]">
               Healthcare <span className="text-[15px] font-medium text-accent">· live first</span>
             </h3>
             <p className="mt-2 text-[17px] text-muted">Bonds backed by contracted health-plan premiums.</p>
           </div>
-          <div className="rounded-[22px] p-8 ring-1 ring-line ring-inset">
+          <div className="reveal rounded-[22px] p-8 ring-1 ring-line ring-inset">
             <h3 className="text-[24px] font-semibold tracking-[-0.02em] text-muted">More contract-backed markets</h3>
             <p className="mt-2 text-[17px] text-muted">Coming after Healthcare.</p>
           </div>

@@ -13,6 +13,68 @@ colors:
   warn: "oklch(0.55 0.13 65)"
   bad: "oklch(0.55 0.19 27)"
 typography:
+  hero:
+    fontFamily: "-apple-system, BlinkMacSystemFont, SF Pro Display, Segoe UI, system-ui, sans-serif"
+    fontSize: "80px"
+    fontWeight: 600
+    lineHeight: 1.05
+    letterSpacing: "-0.035em"
+  hero-mobile:
+    fontFamily: "-apple-system, BlinkMacSystemFont, SF Pro Display, Segoe UI, system-ui, sans-serif"
+    fontSize: "48px"
+    fontWeight: 600
+    lineHeight: 1.05
+    letterSpacing: "-0.035em"
+  display:
+    fontFamily: "-apple-system, BlinkMacSystemFont, SF Pro Display, Segoe UI, system-ui, sans-serif"
+    fontSize: "48px"
+    fontWeight: 600
+    letterSpacing: "-0.025em"
+  title:
+    fontFamily: "-apple-system, BlinkMacSystemFont, SF Pro Display, Segoe UI, system-ui, sans-serif"
+    fontSize: "34px"
+    fontWeight: 600
+    letterSpacing: "-0.025em"
+  yield-lens-large:
+    fontFamily: "-apple-system, BlinkMacSystemFont, SF Pro Display, Segoe UI, system-ui, sans-serif"
+    fontSize: "72px"
+    fontWeight: 600
+    lineHeight: 1
+    letterSpacing: "-0.045em"
+  yield-lens-hero:
+    fontFamily: "-apple-system, BlinkMacSystemFont, SF Pro Display, Segoe UI, system-ui, sans-serif"
+    fontSize: "64px"
+    fontWeight: 600
+    lineHeight: 1
+    letterSpacing: "-0.04em"
+  headline:
+    fontFamily: "-apple-system, BlinkMacSystemFont, SF Pro Display, Segoe UI, system-ui, sans-serif"
+    fontSize: "24px"
+    fontWeight: 600
+    letterSpacing: "-0.02em"
+  subhead:
+    fontFamily: "-apple-system, BlinkMacSystemFont, SF Pro Display, Segoe UI, system-ui, sans-serif"
+    fontSize: "21px"
+    fontWeight: 600
+    letterSpacing: "-0.02em"
+  body-large:
+    fontFamily: "-apple-system, BlinkMacSystemFont, SF Pro Text, Segoe UI, system-ui, sans-serif"
+    fontSize: "17px"
+    fontWeight: 400
+    lineHeight: 1.47
+  figure:
+    fontFamily: "-apple-system, BlinkMacSystemFont, SF Pro Display, Segoe UI, system-ui, sans-serif"
+    fontSize: "28px"
+    fontWeight: 600
+    letterSpacing: "-0.02em"
+  nav:
+    fontFamily: "-apple-system, BlinkMacSystemFont, SF Pro Text, Segoe UI, system-ui, sans-serif"
+    fontSize: "14px"
+    fontWeight: 400
+  micro:
+    fontFamily: "-apple-system, BlinkMacSystemFont, SF Pro Text, Segoe UI, system-ui, sans-serif"
+    fontSize: "11px"
+    fontWeight: 500
   large-title:
     fontFamily: "-apple-system, BlinkMacSystemFont, SF Pro Display, Segoe UI, system-ui, sans-serif"
     fontSize: "40px"
@@ -44,6 +106,7 @@ typography:
     fontFamily: "ui-monospace, SF Mono, Menlo, monospace"
     fontSize: "12px"
 rounded:
+  focus: "10px"
   control: "12px"
   sheet: "18px"
   card: "22px"
@@ -95,6 +158,10 @@ The system font stack is used throughout (SF Pro on Apple devices, Segoe/system 
 ## Layout
 
 The content column is `max-w-[1080px]` with a 20px gutter. Pages open with a large title and description, then the work. The bond page uses a two-column grid (content | 20rem funding column, sticky on large screens). Cards sit in a two-column grid on md and up, and in one column on mobile. The landing page alternates paper and white full-bleed bands at 96px vertical rhythm.
+
+## Motion
+
+Product screens stay still apart from 200ms state transitions (button press scale, hover lift, focus glow) and the confirm sheet's 320ms entrance. Only the landing page moves on scroll, and only in CSS: on load the hero rises in, staggered from headline to card. Sections and items then fade up 32px as they enter the viewport (`.reveal`, scroll-driven `view()` timelines), the "How it works" step lines draw left to right, and the hero card settles slightly as the page scrolls. Browsers without scroll-timeline support show everything static. `prefers-reduced-motion` turns all of it off.
 
 ## Elevation & Depth
 

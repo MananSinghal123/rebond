@@ -94,3 +94,79 @@
 .sheet-in {
   animation: sheet-in 320ms var(--ease-out-expo);
 }
+
+/* Landing motion: load entrance, then scroll-driven reveals. Content is visible without support. */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+}
+@keyframes draw-line {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes hero-settle {
+  to {
+    transform: scale(0.96) translateY(-12px);
+  }
+}
+
+@layer components {
+  .rise-in {
+    animation: rise-in 900ms var(--ease-out-expo) both;
+  }
+
+  .draw-line {
+    position: relative;
+  }
+
+  .draw-line::before {
+    content: "";
+    position: absolute;
+    inset: -2px 0 auto;
+    height: 2px;
+    background: var(--line-color, var(--color-ink));
+    transform-origin: left;
+  }
+
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 5% cover 28%;
+    }
+
+    .reveal-late {
+      animation-range: entry 20% cover 38%;
+    }
+
+    .draw-line::before {
+      animation: draw-line linear both;
+      animation-timeline: view();
+      animation-range: entry 30% cover 45%;
+    }
+
+    .hero-settle {
+      animation: hero-settle linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 70vh;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rise-in,
+    .reveal,
+    .draw-line::before,
+    .hero-settle {
+      animation: none !important;
+    }
+  }
+}

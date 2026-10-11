@@ -10,7 +10,8 @@ import { db } from '@/lib/db';
 import { PUBLIC_STATUSES } from '@/lib/domain/lifecycle';
 import { BOND_STATUSES, parseEnum, PAYOUT_FREQUENCIES } from '@/lib/domain/types';
 import { getCuratorRanks } from '@/lib/services/curators';
-import { attestAction, fundAction } from './actions';
+import { devToolsEnabled } from '@/lib/auth/dev-tools';
+import { advanceTimeAction, attestAction, fundAction } from './actions';
 
 type FundingGate = 'sign-in' | 'not-investor' | 'unverified' | 'can-fund';
 
@@ -19,6 +20,22 @@ async function fundingGate(session: Session | null): Promise<FundingGate> {
   if (session.role !== 'INVESTOR') return 'not-investor';
   const investor = await db.user.findUniqueOrThrow({ where: { id: session.userId }, select: { verified: true } });
   return investor.verified ? 'can-fund' : 'unverified';
+}
+
+function AdvanceTime({ bondId }: { bondId: string }) {
+  return (
+    <Panel title="Demo control: advance time">
+      <form action={advanceTimeAction} className="flex flex-wrap items-center gap-4">
+        <input type="hidden" name="bondId" value={bondId} />
+        <Button variant="secondary">Advance time</Button>
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" name="late" className="accent-[var(--color-accent)]" />
+          Mark this payout as late
+        </label>
+      </form>
+      <p className="mt-2 text-xs text-muted">Pays the next scheduled distribution pro-rata to every position.</p>
+    </Panel>
+  );
 }
 
 export default async function BondPage({
@@ -45,6 +62,7 @@ export default async function BondPage({
   const [gate, ranks] = await Promise.all([fundingGate(session), getCuratorRanks([curator.id])]);
   const score = ranks.get(curator.id)?.score ?? null;
   const remainingCents = bond.amountCents - bond.fundedCents;
+  const showAdvanceTime = status === 'ACTIVE' && session !== null && devToolsEnabled();
 
   const fundingPanel: Record<FundingGate, ReactNode> = {
     'sign-in': <ButtonLink href={`/login?next=/bonds/${bond.id}`}>Sign in to invest</ButtonLink>,
@@ -101,6 +119,7 @@ export default async function BondPage({
         </div>
       </div>
 
+      {showAdvanceTime && <AdvanceTime bondId={bond.id} />}
       <Panel title="Distribution schedule">
         <ScheduleTable rows={toScheduleRows(bond.distributions)} />
       </Panel>

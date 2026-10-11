@@ -136,7 +136,7 @@ export function EmptyState({ title, children }: { title: string; children?: Reac
 export const tableWrapClass = 'overflow-x-auto rounded-lg border border-line bg-surface';
 export const tableClass = 'w-full min-w-[36rem] text-left text-sm';
 export const thClass = 'border-b border-line px-4 py-2 text-xs font-medium text-muted';
-export const tdClass = 'border-b border-line px-4 py-3 last:border-b-0';
+export const tdClass = 'border-b border-line px-4 py-3 [tr:last-child>&]:border-b-0';
 
 export const shortHash = (value: string) => `${value.slice(0, 10)}…${value.slice(-6)}`;
 

@@ -25,7 +25,7 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
             {ROLE_OPTIONS.map((option) => (
               <label
                 key={option.value}
-                className="flex cursor-pointer gap-3 rounded-2xl bg-paper p-4 ring-1 ring-transparent transition-[box-shadow,background-color] duration-200 hover:bg-fill has-[:checked]:bg-accent/5 has-[:checked]:ring-accent"
+                className="flex cursor-pointer gap-3 rounded-[6px] border border-line-strong bg-surface p-4 transition-[border-color,background-color] duration-150 hover:border-ink/30 has-[:checked]:border-accent has-[:checked]:bg-accent/[0.04] has-[:checked]:ring-accent"
               >
                 <input type="radio" name="role" value={option.value} required className="mt-1 accent-[var(--color-accent)]" />
                 <span className="grid gap-0.5">
@@ -39,7 +39,7 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
             <input name="displayName" maxLength={120} className={inputClass} />
           </Field>
           <label className="flex gap-3">
-            <input type="checkbox" name="verified" className="mt-0.5 accent-[var(--color-accent)]" />
+            <input type="checkbox" name="verified" className="mt-0.5 size-4 shrink-0 accent-[var(--color-accent)]" />
             <span>
               Investors: I confirm I am a verified investor. <span className="text-muted">(Self-attested for this demo. Required to fund.)</span>
             </span>

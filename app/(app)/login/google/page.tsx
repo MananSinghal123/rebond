@@ -16,7 +16,7 @@ export default async function GoogleDemoPage({
     <div className="mx-auto max-w-md">
       <PageHeader title="Continue with Google" description="Choose the account to use with ReBond." />
       <Panel className="grid gap-5">
-        <p className="rounded-xl bg-warn/12 px-4 py-3 text-[13px] text-warn">
+        <p className="rounded-[6px] border border-warn/25 bg-warn/[0.06] px-4 py-3 text-[13px] text-warn">
           Demo: this simulates Google sign-in. It creates an account and a demo embedded wallet. Nothing is sent to Google.
         </p>
         <form action={googleDemoAction} className="grid gap-4">
@@ -28,7 +28,7 @@ export default async function GoogleDemoPage({
             <input name="email" type="email" autoComplete="email" required className={inputClass} />
           </Field>
           {error && <Notice>{error}</Notice>}
-          <Button className="h-11 text-[17px]">Continue</Button>
+          <Button className="sm:h-10 sm:text-[15px]">Continue</Button>
         </form>
       </Panel>
     </div>

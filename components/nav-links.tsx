@@ -7,20 +7,21 @@ export type NavItem = { href: string; label: string };
 
 const isActive = (pathname: string, href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
+/** The most specific nav item matching the current path. */
+export const activeHrefFor = (items: NavItem[], pathname: string) =>
+  items.filter((item) => isActive(pathname, item.href)).sort((a, b) => b.href.length - a.href.length)[0]?.href;
+
 export function NavLinks({ items }: { items: NavItem[] }) {
-  const pathname = usePathname();
-  const activeHref = items
-    .filter((item) => isActive(pathname, item.href))
-    .sort((a, b) => b.href.length - a.href.length)[0]?.href;
+  const activeHref = activeHrefFor(items, usePathname());
 
   return (
-    <nav aria-label="Main" className="flex items-center gap-1 overflow-x-auto">
+    <nav aria-label="Main" className="flex items-center overflow-x-auto empty:hidden">
       {items.map((item) => (
         <Link
           key={item.href}
           href={item.href}
           aria-current={item.href === activeHref ? 'page' : undefined}
-          className="rounded-full px-3 py-1.5 text-[14px] whitespace-nowrap text-ink/70 transition-colors duration-200 hover:text-ink aria-[current=page]:bg-ink/[0.06] aria-[current=page]:font-medium aria-[current=page]:text-ink"
+          className="relative flex h-11 items-center px-3 text-[14px] whitespace-nowrap text-ink-2 transition-colors duration-150 after:absolute after:inset-x-3 after:-bottom-px after:h-0.5 after:bg-transparent hover:text-ink aria-[current=page]:font-medium aria-[current=page]:text-ink aria-[current=page]:after:bg-ink sm:h-14"
         >
           {item.label}
         </Link>

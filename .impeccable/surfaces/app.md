@@ -11,20 +11,20 @@ Scope: every route (`/`, `/privacy`, `/login`, `/onboarding`, `/bonds`, `/bonds/
 
 ## Direction contract
 
-Seed key: 5ea6531e (the roll was overridden by the brief's pin: an Apple-inspired philosophy with ReBond's own identity).
+Seed key: 5ea6531e. Replaced 2026-10-11 by the user's pinned direction (Stripe/Linear/Bloomberg-level enterprise polish, IBM Plex, refined green, ledger density); no new roll was run because the brief pinned the world.
 
-THESIS: Clarity, deference and depth. The interface steps back so the bond's numbers and their proof lead.
+THESIS: Ledger. Every figure reads like a line on a term sheet someone could audit.
 
-WORLD: A cool neutral ground with white raised sheets, one ReBond green accent used only for actions, progress and positive state, and the system font at Apple-like scale contrast. Depth comes from soft layered shadows, never from borders.
+WORLD: Warm paper ground, white sheets ruled with hairlines, near-black ink, one deep ReBond green for actions, progress and positive state. IBM Plex Sans with uppercase micro-labels; Plex Mono only for hashes and indices. Structure comes from hairlines; only floating surfaces cast shadows. Small radii (4/6/8px), no gradients, glass or decorative motion.
 
-FIRST VIEWPORT: One frosted, sticky global header on every route, with the demo notice as a slim ribbon above it. The landing page opens with a centred large-title headline over a floating, real-structure example bond card. App pages open with a large title, then the work.
+FIRST VIEWPORT: One opaque, sticky, hairline-ruled header with the ledger mark and text tabs on every route, with the demo notice as a slim ink ribbon above it. The landing page opens with a left-aligned headline beside a floating example term sheet. App pages open with a title and description closed by a hairline, then the work.
 
 VISITOR PATH: Header → Bonds grid (the yield is the largest figure on each card) → bond sheet (terms, funding, curator, schedule) → confirm sheet → portfolio.
 
-SIGNATURE MOVE: The "yield lens". The rate is set huge in tabular figures with the curator credit beside it, the same on cards, the bond page and the portfolio. Cards lift gently on hover.
+SIGNATURE MOVE: The "yield lens" plus the footnoted term sheet. The rate is the largest figure in medium-weight tabular Plex wherever a bond appears, with the curator credit beside it. On the landing page, numbered markers on the term sheet's Backing, Curator and Chain record lines match the three proof columns below.
 
-CROSS-SURFACE: One header component, one button family (pills), one sheet style, and inset-grouped tables everywhere.
+CROSS-SURFACE: One header component, one button family (6px rectangles), one hairline sheet style, joined stat strips, and ruled tables with right-aligned figures everywhere.
 
-HONEST RISK: Restraint can read as generic. The yield lens and the depth system must carry the identity.
+HONEST RISK: Hairline restraint can read as austere or generic. The ledger mark, the uppercase label system, the yield lens and the footnoted term sheet must carry the identity.
 
 Raise from the declined challenger (monochrome product marketing): every claim on the landing page is paired with an interface detail that proves it.

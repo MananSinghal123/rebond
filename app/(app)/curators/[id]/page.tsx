@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireRole } from '@/lib/auth/session';
-import { PageHeader, Panel, Stat, StatusBadge } from '@/components/ui';
+import { PageHeader, Panel, Stat, StatGrid, StatusBadge } from '@/components/ui';
 import { formatRate, formatUsd } from '@/lib/domain/money';
 import { getCuratorProfile } from '@/lib/services/curators';
 
@@ -12,28 +12,28 @@ export default async function CuratorProfilePage({ params }: { params: Promise<{
   const { rank } = profile;
 
   return (
-    <div className="grid gap-8">
+    <div className="grid gap-6">
       <PageHeader
         title={profile.displayName}
         description={profile.bio || 'Curator. Vets applications and puts their name on the bonds below.'}
       />
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      <StatGrid>
         <Stat label="Rank score" value={rank.score === null ? 'Unrated' : rank.score} />
         <Stat label="On-time distributions" value={rank.onTimePct === null ? '—' : `${rank.onTimePct}%`} />
         <Stat label="Bonds curated" value={profile.bondsCurated} />
         <Stat label="Total volume" value={formatUsd(profile.totalVolumeCents)} />
-      </div>
-      <p className="text-muted">
+      </StatGrid>
+      <p className="-mt-2 text-[13px] text-muted">
         Late distributions: {rank.lateCount}. The score is the share of distributions paid on time, weighted by bond size.
       </p>
       <Panel title="Curated bonds">
         {profile.bonds.length === 0 ? (
           <p className="text-muted">No bonds listed yet.</p>
         ) : (
-          <ul className="grid gap-2">
+          <ul data-reveal="stagger" className="-my-3">
             {profile.bonds.map((bond) => (
-              <li key={bond.id} className="flex flex-wrap items-center justify-between gap-3">
-                <Link href={`/bonds/${bond.id}`} className="hover:underline">
+              <li key={bond.id} className="flex flex-wrap items-center justify-between gap-3 border-b border-line py-3 last:border-b-0">
+                <Link href={`/bonds/${bond.id}`} className="-my-2.5 inline-block py-2.5 text-[14px] hover:text-accent hover:underline">
                   {bond.companyName} · {formatUsd(bond.amountCents)} · {formatRate(bond.rateBps)} · {bond.termMonths} mo
                 </Link>
                 <StatusBadge status={bond.status} />

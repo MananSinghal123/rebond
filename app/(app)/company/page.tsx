@@ -34,7 +34,7 @@ export default async function CompanyDashboard() {
           <ButtonLink href="/company/apply">Apply to raise a bond</ButtonLink>
         </EmptyState>
       )}
-      <ul className="grid gap-4">
+      <ul className="grid gap-3">
         {company.bonds.map((bond) => {
           const status = parseEnum(BOND_STATUSES, bond.status);
           const nextDistribution = bond.distributions[0];
@@ -42,13 +42,13 @@ export default async function CompanyDashboard() {
             <li key={bond.id}>
               <Panel>
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <Link href={`/company/bonds/${bond.id}`} className="font-medium hover:underline">
+                  <Link href={`/company/bonds/${bond.id}`} className="-my-2.5 inline-block py-2.5 font-medium hover:text-accent hover:underline">
                     {formatUsd(bond.amountCents)} · {formatRate(bond.rateBps)} · {bond.termMonths} months
                   </Link>
                   <StatusBadge status={status} />
                 </div>
                 {bond.reviewNote && (
-                  <p className="mt-3 rounded-xl bg-paper px-3 py-2">
+                  <p className="mt-3 border-l border-line-strong pl-4 text-[14px] text-ink-2">
                     <span className="text-muted">Curator note: </span>
                     {bond.reviewNote}
                   </p>
@@ -59,7 +59,7 @@ export default async function CompanyDashboard() {
                   </div>
                 )}
                 {nextDistribution && (
-                  <p className="mt-3 text-muted">
+                  <p className="mt-3 text-[13px] text-muted">
                     Next distribution {formatUsd(nextDistribution.amountCents)} due {formatDate(nextDistribution.dueDate)}
                   </p>
                 )}

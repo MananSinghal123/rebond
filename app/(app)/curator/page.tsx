@@ -5,9 +5,11 @@ import {
   EmptyState,
   formatDate,
   Notice,
+  numClass,
   PageHeader,
   Panel,
   Stat,
+  StatGrid,
   StatusBadge,
   tableClass,
   tableWrapClass,
@@ -38,7 +40,7 @@ export default async function CuratorHome({ searchParams }: { searchParams: Prom
   const feesCents = feesAccruedCents(mine);
 
   return (
-    <div className="grid gap-8">
+    <div className="grid gap-6">
       <PageHeader
         title={curator.displayName}
         description="Claim an application to review it. Approving lists it for investors with your name attached."
@@ -46,11 +48,11 @@ export default async function CuratorHome({ searchParams }: { searchParams: Prom
       />
       {error && <Notice>{error}</Notice>}
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <StatGrid className="grid-cols-2 sm:grid-cols-3">
         <Stat label="Waiting in queue" value={queue.length} />
         <Stat label="Bonds you listed" value={listedByMe.length} />
-        <Stat label="Fees accrued (simulated)" value={formatUsd(feesCents)} />
-      </div>
+        <Stat label="Fees accrued (simulated)" value={formatUsd(feesCents)} className="col-span-2 sm:col-span-1" />
+      </StatGrid>
 
       <Panel title="Queue">
         {queue.length === 0 ? (
@@ -64,25 +66,25 @@ export default async function CuratorHome({ searchParams }: { searchParams: Prom
               <thead>
                 <tr>
                   <th className={thClass}>Company</th>
-                  <th className={thClass}>Raise</th>
-                  <th className={thClass}>Rate</th>
-                  <th className={thClass}>Term</th>
+                  <th className={`${thClass} ${numClass}`}>Raise</th>
+                  <th className={`${thClass} ${numClass}`}>Rate</th>
+                  <th className={`${thClass} ${numClass}`}>Term</th>
                   <th className={thClass}>Submitted</th>
                   <th className={thClass}><span className="sr-only">Action</span></th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody data-reveal="stagger">
                 {queue.map((bond) => (
                   <tr key={bond.id}>
-                    <td className={tdClass}>{bond.company.name}</td>
-                    <td className={tdClass}>{formatUsd(bond.amountCents)}</td>
-                    <td className={tdClass}>{formatRate(bond.rateBps)}</td>
-                    <td className={tdClass}>{bond.termMonths} mo</td>
-                    <td className={tdClass}>{formatDate(bond.updatedAt)}</td>
-                    <td className={`${tdClass} text-right`}>
+                    <td data-primary className={`${tdClass} font-medium`}>{bond.company.name}</td>
+                    <td data-figure className={`${tdClass} ${numClass}`}>{formatUsd(bond.amountCents)}</td>
+                    <td data-label="Rate" className={`${tdClass} ${numClass}`}>{formatRate(bond.rateBps)}</td>
+                    <td data-label="Term" className={`${tdClass} ${numClass}`}>{bond.termMonths} mo</td>
+                    <td data-label="Submitted" className={`${tdClass} text-ink-2`}>{formatDate(bond.updatedAt)}</td>
+                    <td data-action className={`${tdClass} text-right`}>
                       <form action={claimAction}>
                         <input type="hidden" name="bondId" value={bond.id} />
-                        <Button variant="secondary" aria-label={`Claim ${bond.company.name}`}>Claim</Button>
+                        <Button variant="secondary" className="sm:h-8 sm:px-3 sm:text-[13px]" aria-label={`Claim ${bond.company.name}`}>Claim</Button>
                       </form>
                     </td>
                   </tr>
@@ -97,13 +99,13 @@ export default async function CuratorHome({ searchParams }: { searchParams: Prom
         {mine.length === 0 ? (
           <p className="text-muted">Bonds you claim or list appear here.</p>
         ) : (
-          <ul className="grid gap-2">
+          <ul data-reveal="stagger" className="-my-3">
             {mine.map((bond) => {
               const label = `${bond.company.name} · ${formatUsd(bond.amountCents)} · ${formatRate(bond.rateBps)}`;
               const href = PUBLIC_STATUSES.includes(bond.status) ? `/bonds/${bond.id}` : `/curator/review/${bond.id}`;
               return (
-                <li key={bond.id} className="flex flex-wrap items-center justify-between gap-3">
-                  <Link href={href} className="hover:underline">{label}</Link>
+                <li key={bond.id} className="flex flex-wrap items-center justify-between gap-3 border-b border-line py-3 last:border-b-0">
+                  <Link href={href} className="-my-2.5 inline-block py-2.5 text-[14px] hover:text-accent hover:underline">{label}</Link>
                   <StatusBadge status={bond.status} />
                 </li>
               );

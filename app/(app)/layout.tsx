@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
 
 export default function AppLayout({ children }: { children: ReactNode }) {
-  return <main className="mx-auto max-w-[1080px] px-5 pt-12 pb-24">{children}</main>;
+  return <main className="mx-auto max-w-[1120px] px-4 pt-6 pb-16 sm:px-5 sm:pt-10 sm:pb-24">{children}</main>;
 }

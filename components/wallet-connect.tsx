@@ -97,12 +97,12 @@ export function WalletConnect({ mode, next = '' }: { mode: 'sign-in' | 'link'; n
           key={wallet.id}
           type="button"
           variant="secondary"
-          className="h-11 justify-start gap-3 px-4"
+          className="justify-start gap-3 px-3.5 sm:h-10"
           disabled={status.kind === 'signing'}
           onClick={() => connect(wallet)}
         >
           {/* eslint-disable-next-line @next/next/no-img-element -- wallet icons are data URIs injected by the extension */}
-          <img src={wallet.icon} alt="" width={22} height={22} className="rounded-md" />
+          <img src={wallet.icon} alt="" width={22} height={22} className="rounded-[4px]" />
           {status.kind === 'signing' && status.name === wallet.name ? 'Waiting for signature…' : `Continue with ${wallet.name}`}
         </Button>
       ))}

@@ -1,32 +1,43 @@
 @import "tailwindcss";
 
+/*
+  Ledger: an institutional system. Warm paper ground, white sheets ruled with hairlines,
+  near-black ink, one deep ReBond green. Elevation is a hairline border on resting surfaces
+  and a shadow only on things that float (popover, dialog).
+*/
 @theme {
-  --color-paper: oklch(0.975 0.003 260);
+  --color-paper: oklch(0.982 0.003 95);
   --color-surface: oklch(1 0 0);
-  --color-fill: oklch(0.94 0.004 260);
-  --color-ink: oklch(0.21 0.005 260);
-  --color-muted: oklch(0.52 0.008 260);
-  --color-line: oklch(0.21 0.005 260 / 0.1);
-  --color-accent: oklch(0.52 0.13 158);
-  --color-accent-ink: oklch(0.99 0.01 158);
-  --color-warn: oklch(0.55 0.13 65);
-  --color-bad: oklch(0.55 0.19 27);
+  --color-fill: oklch(0.963 0.004 95);
+  --color-ink: oklch(0.2 0.008 255);
+  --color-ink-2: oklch(0.36 0.01 255);
+  --color-muted: oklch(0.5 0.01 255);
+  --color-line: oklch(0.2 0.008 255 / 0.1);
+  --color-line-strong: oklch(0.2 0.008 255 / 0.18);
+  --color-accent: oklch(0.47 0.1 162);
+  --color-accent-hover: oklch(0.41 0.09 162);
+  --color-accent-ink: oklch(0.995 0.005 162);
+  --color-warn: oklch(0.52 0.12 68);
+  --color-bad: oklch(0.52 0.17 27);
 
-  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, "Helvetica Neue", sans-serif;
-  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", system-ui, "Helvetica Neue", sans-serif;
-  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+  --font-sans: var(--font-plex-sans), "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-plex-sans), "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), "IBM Plex Mono", ui-monospace, Menlo, monospace;
 
-  --shadow-sheet: 0 1px 2px oklch(0.21 0.005 260 / 0.04), 0 6px 24px oklch(0.21 0.005 260 / 0.06);
-  --shadow-lift: 0 2px 4px oklch(0.21 0.005 260 / 0.05), 0 18px 48px oklch(0.21 0.005 260 / 0.12);
-  --shadow-float: 0 4px 8px oklch(0.21 0.005 260 / 0.04), 0 32px 80px oklch(0.21 0.005 260 / 0.16);
+  --radius-control: 6px;
+  --radius-sheet: 8px;
+
+  --shadow-float: 0 0 0 1px oklch(0.2 0.008 255 / 0.08), 0 1px 2px oklch(0.2 0.008 255 / 0.06), 0 12px 32px -8px oklch(0.2 0.008 255 / 0.18);
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @layer base {
   html {
     color-scheme: light;
     -webkit-text-size-adjust: 100%;
+    scrollbar-color: oklch(0.2 0.008 255 / 0.22) transparent;
   }
 
   body {
@@ -34,10 +45,11 @@
     color: var(--color-ink);
     font-family: var(--font-sans);
     font-size: 15px;
-    line-height: 1.47;
-    letter-spacing: -0.01em;
+    line-height: 1.5;
     font-variant-numeric: tabular-nums;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: geometricPrecision;
   }
 
   h1,
@@ -48,13 +60,13 @@
   }
 
   :focus-visible {
-    outline: 3px solid color-mix(in oklch, var(--color-accent) 45%, transparent);
+    outline: 2px solid var(--color-accent);
     outline-offset: 2px;
-    border-radius: 10px;
+    border-radius: 4px;
   }
 
   ::selection {
-    background: color-mix(in oklch, var(--color-accent) 20%, transparent);
+    background: color-mix(in oklch, var(--color-accent) 18%, transparent);
     color: var(--color-ink);
   }
 
@@ -70,8 +82,7 @@
   }
 
   dialog::backdrop {
-    background: oklch(0.21 0.005 260 / 0.28);
-    backdrop-filter: blur(6px);
+    background: oklch(0.2 0.008 255 / 0.32);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -84,89 +95,342 @@
   }
 }
 
+/* Small uppercase data label: column heads, term labels, stat captions. */
+@utility label {
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
 @keyframes sheet-in {
   from {
     opacity: 0;
-    transform: translateY(12px) scale(0.98);
+    transform: translateY(6px);
   }
 }
 
 .sheet-in {
-  animation: sheet-in 320ms var(--ease-out-expo);
+  animation: sheet-in 200ms var(--ease-out-expo);
 }
 
-/* Landing motion: load entrance, then scroll-driven reveals. Content is visible without support. */
-@keyframes rise-in {
-  from {
+/*
+  Landing term-sheet deck. The front sheet lifts and fades on top of the stack, then drops to
+  the back (its resting transform comes from inline style) while the next sheet rises forward.
+*/
+@keyframes deck-leave {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+    z-index: 40;
+  }
+  40% {
+    transform: translateY(-18px) scale(1.01);
     opacity: 0;
-    transform: translateY(18px);
+    z-index: 40;
+  }
+  41% {
+    opacity: 0;
+    z-index: 0;
+  }
+  100% {
+    opacity: 1;
+    z-index: 0;
   }
 }
-@keyframes reveal {
+
+.deck-leave {
+  animation: deck-leave 900ms var(--ease-out-expo);
+}
+
+/*
+  Motion system. Two kinds, kept separate on purpose:
+
+  1. Scroll-triggered reveals (every page). Elements marked data-reveal play a fixed-length
+     entrance once they enter the viewport, so they always finish, even on pages too short to
+     scroll. components/motion-observer.tsx watches them, staggers elements that arrive together,
+     and sets data-in. The `motion` class on <html> is added before first paint by a head script,
+     only when the viewer has not asked for reduced motion; without it everything is static.
+       data-reveal="up"       fade in, rising 18px
+       data-reveal="stagger"  its direct children rise in one after another (lists, table rows)
+       data-reveal="rule"     its ::before hairline draws left to right (pair with .rule-draw)
+
+  2. Scroll-linked effects (landing only). Driven by CSS scroll timelines, absent where
+     unsupported: the hero recedes, white bands brighten from paper, the page progress line.
+*/
+/* Transform and opacity run on different clocks: the content is readable before it settles. */
+@keyframes reveal-up {
   from {
-    opacity: 0;
-    transform: translateY(32px);
+    transform: translate3d(0, 18px, 0);
   }
 }
-@keyframes draw-line {
+
+@keyframes reveal-item {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+}
+
+@keyframes rule-draw {
   from {
     transform: scaleX(0);
   }
 }
-@keyframes hero-settle {
+
+/* If the observer never runs (script error), content still appears. */
+@keyframes reveal-failsafe {
   to {
-    transform: scale(0.96) translateY(-12px);
+    opacity: 1;
+    transform: none;
   }
 }
 
-@layer components {
-  .rise-in {
-    animation: rise-in 900ms var(--ease-out-expo) both;
-  }
+.motion [data-reveal="up"]:not([data-in]),
+.motion [data-reveal="stagger"]:not([data-in]) > * {
+  opacity: 0;
+  animation: reveal-failsafe 1ms 2.2s forwards;
+}
 
-  .draw-line {
-    position: relative;
-  }
+.motion [data-reveal="up"][data-in] {
+  animation:
+    reveal-up 1100ms var(--ease-out-expo) var(--reveal-delay, 0ms) backwards,
+    reveal-fade 700ms var(--ease-out-quint) var(--reveal-delay, 0ms) backwards;
+}
 
-  .draw-line::before {
-    content: "";
-    position: absolute;
-    inset: -2px 0 auto;
-    height: 2px;
-    background: var(--line-color, var(--color-ink));
+.motion [data-reveal="stagger"][data-in] > * {
+  animation: reveal-item 900ms var(--ease-out-expo) var(--reveal-delay, 0ms) backwards;
+}
+
+@keyframes reveal-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* The element keeps its border for layout; a drawn hairline replaces it visually. */
+.rule-draw {
+  position: relative;
+  border-top-color: transparent;
+}
+
+.rule-draw::before {
+  content: "";
+  position: absolute;
+  top: calc(-1 * var(--rule-w, 1px));
+  left: 0;
+  right: 0;
+  height: var(--rule-w, 1px);
+  background: var(--rule-color, var(--color-line));
+  transform-origin: left;
+}
+
+.motion [data-reveal="rule"]:not([data-in])::before {
+  transform: scaleX(0);
+  animation: reveal-failsafe 1ms 2.2s forwards;
+}
+
+.motion [data-reveal="rule"][data-in]::before {
+  animation: rule-draw 1400ms var(--ease-out-expo) var(--reveal-delay, 0ms) backwards;
+}
+
+/* Landing hero entrance on load, in reading order. */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+  }
+}
+
+.motion .rise-in {
+  animation: rise-in 1000ms var(--ease-out-expo) both;
+  animation-delay: calc(var(--stagger, 0) * 100ms + 80ms);
+}
+
+@keyframes hero-recede {
+  to {
+    opacity: 0.25;
+    transform: translate3d(0, -48px, 0);
+  }
+}
+
+@keyframes hero-drift {
+  to {
+    transform: translate3d(0, 64px, 0);
+  }
+}
+
+@keyframes band-brighten {
+  from {
+    background-color: var(--color-paper);
+  }
+}
+
+@keyframes page-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.page-progress {
+  display: none;
+}
+
+@supports (animation-timeline: scroll()) {
+  .motion .page-progress {
+    display: block;
     transform-origin: left;
+    animation: page-progress linear both;
+    animation-timeline: scroll(root);
   }
 
-  @supports (animation-timeline: view()) {
-    .reveal {
-      animation: reveal linear both;
-      animation-timeline: view();
-      animation-range: entry 5% cover 28%;
-    }
+  /* White bands start as paper and brighten as they arrive, so section changes read as light. */
+  .motion .band {
+    animation: band-brighten linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 90%;
+  }
 
-    .reveal-late {
-      animation-range: entry 20% cover 38%;
-    }
-
-    .draw-line::before {
-      animation: draw-line linear both;
-      animation-timeline: view();
-      animation-range: entry 30% cover 45%;
-    }
-
-    .hero-settle {
-      animation: hero-settle linear both;
+  /* Parallax only where there is room for it: the copy lifts away, the deck lags behind. */
+  @media (min-width: 1024px) {
+    .motion .hero-recede {
+      animation: hero-recede linear both;
       animation-timeline: scroll(root);
-      animation-range: 0 70vh;
+      animation-range: 0 75vh;
     }
+
+    .motion .hero-drift {
+      animation: hero-drift linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 90vh;
+    }
+  }
+}
+
+
+/*
+  Responsive tables. Below 640px each row becomes a compact record: the cell marked data-primary
+  leads, the cell marked data-figure sits opposite it, and every other cell becomes a
+  label/value line from its data-label. data-action cells span the row; data-mobile-hide cells
+  drop out. Column headers stay available to screen readers.
+*/
+@media (max-width: 639px) {
+  .rtable,
+  .rtable tbody {
+    display: block;
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .rise-in,
-    .reveal,
-    .draw-line::before,
-    .hero-settle {
-      animation: none !important;
-    }
+  .rtable thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
+
+  .rtable tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 16px;
+    row-gap: 6px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .rtable tr:first-child {
+    padding-top: 0;
+  }
+
+  .rtable tr:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .rtable td {
+    display: block;
+    grid-column: 1 / -1;
+    padding: 0;
+    border: 0;
+    font-size: 14px;
+    text-align: right;
+  }
+
+  .rtable td::before {
+    content: attr(data-label);
+    float: left;
+    margin-right: 16px;
+    font-size: 11px;
+    line-height: 21px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .rtable td[data-primary] {
+    grid-column: 1;
+    grid-row: 1;
+    margin-bottom: 2px;
+    text-align: left;
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .rtable td[data-figure] {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .rtable td[data-primary]::before,
+  .rtable td[data-figure]::before,
+  .rtable td[data-action]::before {
+    content: none;
+  }
+
+  .rtable td[data-action] {
+    margin-top: 6px;
+  }
+
+  .rtable td[data-action] :is(button, a) {
+    width: 100%;
+  }
+
+  .rtable td[data-mobile-hide] {
+    display: none;
+  }
+}
+
+/* Mobile menu sheet (native popover): fades and settles in, and locks page scroll while open. */
+.menu-sheet {
+  opacity: 0;
+  transform: translate3d(0, -8px, 0);
+  transition:
+    opacity 200ms var(--ease-out-quint),
+    transform 320ms var(--ease-out-expo),
+    overlay 320ms allow-discrete,
+    display 320ms allow-discrete;
+}
+
+.menu-sheet:popover-open {
+  opacity: 1;
+  transform: none;
+}
+
+@starting-style {
+  .menu-sheet:popover-open {
+    opacity: 0;
+    transform: translate3d(0, -8px, 0);
+  }
+}
+
+html:has(.menu-sheet:popover-open) {
+  overflow: hidden;
 }

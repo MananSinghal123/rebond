@@ -36,7 +36,7 @@ The app is used as a demo in pitch settings and by testers walking the §10 scri
 ## Brand Commitments
 
 - The name is ReBond. The landing headline is "Real yield from real contracts."
-- Visual direction requested by the user: inspired by Apple's design philosophy (clarity, deference to content, depth), applied to ReBond's own identity. Use no Apple marks, product imagery or copied layouts (confirmed 2026-10-11).
+- Visual direction requested by the user: a premium, enterprise-grade product at the craft level of Stripe, Linear and Bloomberg, with ReBond's own identity. Avoid generic SaaS templates, flashy gradients, excessive rounding and unnecessary animation. Typeface IBM Plex Sans and Plex Mono; keep and refine the ReBond green; tighter, data-forward investor screens. Copy none of those companies' marks or layouts (confirmed 2026-10-11, replaces the earlier Apple-inspired direction).
 - One shared header component on every route, including `/` and `/bonds`.
 
 ## Evidence on Hand

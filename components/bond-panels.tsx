@@ -1,4 +1,4 @@
-import { formatDate, FREQUENCY_LABEL, ProgressBar, shortHash, tableClass, tableWrapClass, tdClass, thClass } from '@/components/ui';
+import { formatDate, FREQUENCY_LABEL, numClass, ProgressBar, shortHash, tableClass, tableWrapClass, tdClass, thClass } from '@/components/ui';
 import { formatRate, formatUsd, fundedPct } from '@/lib/domain/money';
 import {
   CHAIN_EVENT_TYPES,
@@ -40,11 +40,11 @@ export function BondTerms(props: BondTermsProps) {
     ['Maturity', props.maturityDate ? formatDate(props.maturityDate) : 'Set when fully funded'],
   ];
   return (
-    <dl className="grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-3">
+    <dl className="grid grid-cols-2 border-y border-line py-1.5 sm:grid-cols-3">
       {rows.map(([label, value]) => (
-        <div key={label}>
-          <dt className="text-[13px] text-muted">{label}</dt>
-          <dd className="mt-0.5 text-[17px] font-medium tracking-[-0.01em]">{value}</dd>
+        <div key={label} className="py-2.5 pr-4">
+          <dt className="label">{label}</dt>
+          <dd className="mt-1 text-[15px] font-medium">{value}</dd>
         </div>
       ))}
     </dl>
@@ -54,14 +54,13 @@ export function BondTerms(props: BondTermsProps) {
 export function FundingProgress({ fundedCents, amountCents }: { fundedCents: number; amountCents: number }) {
   const pct = fundedPct(fundedCents, amountCents);
   return (
-    <div className="grid gap-3">
-      <p>
-        <span className="block font-[family-name:var(--font-display)] text-[28px] leading-tight font-semibold tracking-[-0.02em]">
-          {formatUsd(fundedCents)}
-        </span>
-        <span className="text-[13px] text-muted">of {formatUsd(amountCents)} raised · {pct}%</span>
-      </p>
+    <div className="grid gap-2.5">
+      <p className="text-[24px] leading-tight font-medium tracking-[-0.015em]">{formatUsd(fundedCents)}</p>
       <ProgressBar pct={pct} label="Funding progress" />
+      <p className="flex justify-between gap-4 text-[13px] text-muted">
+        <span>of {formatUsd(amountCents)} raised</span>
+        <span className="font-medium text-ink">{pct}%</span>
+      </p>
     </div>
   );
 }
@@ -88,21 +87,21 @@ export function ScheduleTable({ rows }: { rows: ScheduleRow[] }) {
           <tr>
             <th className={thClass}>#</th>
             <th className={thClass}>Due</th>
-            <th className={thClass}>Amount</th>
+            <th className={`${thClass} ${numClass}`}>Amount</th>
             <th className={thClass}>Includes</th>
             <th className={thClass}>Status</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody data-reveal="stagger">
           {rows.map((row) => (
             <tr key={row.id}>
-              <td className={tdClass}>{row.seq}</td>
-              <td className={tdClass}>{formatDate(row.dueDate)}</td>
-              <td className={tdClass}>{formatUsd(row.amountCents)}</td>
-              <td className={tdClass}>{row.isPrincipal ? 'Interest + principal' : 'Interest'}</td>
-              <td className={`${tdClass} ${row.status === 'SCHEDULED' ? 'text-muted' : ''}`}>
+              <td data-mobile-hide className={`${tdClass} font-mono text-[13px] text-muted`}>{String(row.seq).padStart(2, '0')}</td>
+              <td data-primary className={tdClass}>{formatDate(row.dueDate)}</td>
+              <td data-figure className={`${tdClass} ${numClass} font-medium`}>{formatUsd(row.amountCents)}</td>
+              <td data-label="Includes" className={tdClass}>{row.isPrincipal ? 'Interest + principal' : 'Interest'}</td>
+              <td data-label="Status" className={`${tdClass} ${row.status === 'SCHEDULED' ? 'text-muted' : ''}`}>
                 <span className="inline-flex items-center gap-2">
-                  <span aria-hidden className={`size-2 rounded-full ${STATUS_DOT[row.status]}`} />
+                  <span aria-hidden className={`size-1.5 rounded-full ${STATUS_DOT[row.status]}`} />
                   {DISTRIBUTION_LABEL[row.status]}
                 </span>
                 {row.paidAt && <span className="text-muted"> · {formatDate(row.paidAt)}</span>}
@@ -126,19 +125,19 @@ export const toChainRows = (rows: (Omit<ChainRow, 'type'> & { type: string })[])
 export function ChainRecord({ events }: { events: ChainRow[] }) {
   if (events.length === 0) return <p className="text-muted">No on-chain events yet.</p>;
   return (
-    <ol className="grid">
+    <ol data-reveal="stagger" className="grid">
       {events.map((event) => (
         <li
           key={event.id}
-          className="grid grid-cols-[1fr_auto] gap-x-4 gap-y-0.5 border-b border-line py-3.5 first:pt-0 last:border-b-0 last:pb-0"
+          className="grid grid-cols-[1fr_auto] items-baseline gap-x-4 gap-y-1 border-b border-line py-3 first:pt-0 last:border-b-0 last:pb-0"
         >
-          <span className="font-medium">{EVENT_LABEL[event.type]}</span>
+          <span className="text-[14px] font-medium">{EVENT_LABEL[event.type]}</span>
           <span className="text-[13px] text-muted">{formatDate(event.createdAt)}</span>
-          <span className="font-mono text-[12px] text-muted" title={event.txHash}>tx {shortHash(event.txHash)}</span>
+          <span className="font-mono text-[12px] whitespace-nowrap text-ink-2 max-sm:col-span-2" title={event.txHash}>tx {shortHash(event.txHash)}</span>
           <span
             aria-disabled="true"
             title="Simulated record: not on a real network"
-            className="text-[13px] text-accent"
+            className="text-[13px] text-accent max-sm:col-span-2"
           >
             View on explorer (simulated)
           </span>

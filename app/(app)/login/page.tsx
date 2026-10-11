@@ -19,17 +19,17 @@ export default async function LoginPage({
       <PageHeader title="Sign in to ReBond" description="Continue with Google or a Cardano wallet. You will pick your role next." />
       <Panel className="grid gap-6">
         <div className="grid gap-2">
-          <ButtonLink href={googleHref} className="h-11 text-[17px]">Continue with Google</ButtonLink>
+          <ButtonLink href={googleHref} className="sm:h-10 sm:text-[15px]">Continue with Google</ButtonLink>
           <p className="text-center text-[12px] text-muted">Creates a demo embedded wallet for you.</p>
         </div>
 
         <div className="grid gap-3">
-          <p className="text-[13px] font-medium text-ink/80">Or connect a Cardano wallet</p>
+          <p className="text-[13px] font-medium text-ink-2">Or connect a Cardano wallet</p>
           <WalletConnect mode="sign-in" next={next} />
         </div>
 
         <details className="group border-t border-line pt-5" open={Boolean(error)}>
-          <summary className="cursor-pointer list-none text-[13px] font-medium text-muted hover:text-ink">
+          <summary className="-my-3 cursor-pointer list-none py-3 text-[14px] font-medium text-muted hover:text-ink sm:my-0 sm:py-0 sm:text-[13px]">
             Use email and password instead
           </summary>
           <form action={authenticate} className="mt-4 grid gap-4">

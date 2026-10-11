@@ -9,5 +9,13 @@ export default defineConfig({
   test: {
     include: ['tests/**/*.test.ts'],
     environment: 'node',
+    globalSetup: ['tests/helpers/global-setup.ts'],
+    fileParallelism: false,
+    testTimeout: 20_000,
+    env: {
+      DATABASE_URL: 'file:./test.db',
+      SESSION_SECRET: 'test-session-secret-at-least-32-characters',
+      BCRYPT_ROUNDS: '4',
+    },
   },
 });
